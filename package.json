@@ -5,7 +5,7 @@
   "main": "main.js",
   "repository": {
     "type": "github.com",
-    "url": "https://github.com/vicimpa/chatroulette"
+    "url": "https://github.com/qrlk/videochatru-mitm"
   },
   "keywords": [
     "desktop",
@@ -20,7 +20,7 @@
     "camera",
     "cam"
   ],
-  "author": "PromiSe####",
+  "author": "qrlk",
   "scripts": {
     "start": "electron .",
     "start-dev": "electron . --dev",
@@ -47,6 +47,9 @@
       "main.js",
       "icon.png"
     ],
+    "extraResources": [
+      "ext"
+    ],
     "directories": {
       "output": "./build"
     },
@@ -64,5 +67,10 @@
       "description": "ChatRoulette for Linux",
       "executableName": "ChatRoulette"
     }
+  },
+  "dependencies": {
+    "electron-peer-connection": "^1.0.6",
+    "electron-prompt": "^1.6.2",
+    "electron-shortcuts": "^0.4.0"
   }
 }

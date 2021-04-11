@@ -1,5 +1,6 @@
-const { app, BrowserWindow, systemPreferences, Menu } = require('electron')
+const { app, BrowserWindow, systemPreferences, Menu, session, ipcMain } = require('electron')
 const { join } = require('path')
+const prompt = require('electron-prompt');
 
 let mainWindow = null
 
@@ -10,76 +11,154 @@ if (process.platform == 'linux') {
   app.commandLine.appendSwitch("disable-software-rasterizer")
 }
 
+let id1 = app.commandLine.getSwitchValue("id1")
+let id2 = app.commandLine.getSwitchValue("id2")
+
 async function initialize() {
-  makeSingleInstance()
+  function start() {
+    console.log("persist:" + id2)
+    ses = session.fromPartition("persist:" + id1)
+
+    ses.loadExtension(join(__dirname, 'ext/fhkphphbadjkepgfljndicmgdlndmoke'))
+    ses.loadExtension(join(__dirname, 'ext/lanfdkkpgfjfdikkncbnojekcppdebfp'))
+    ses.loadExtension(join(__dirname, 'ext/olnbjpaejebpnokblkepbphhembdicik'))
+    ses.loadExtension(join(__dirname, 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
+
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/fhkphphbadjkepgfljndicmgdlndmoke'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/lanfdkkpgfjfdikkncbnojekcppdebfp'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/olnbjpaejebpnokblkepbphhembdicik'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
+
+    ses.on('will-download', function (e, item, webContents) {
+      item.setSavePath(join(app.getPath("downloads"), item.getFilename()))
+    })
+
+    ses = session.fromPartition("persist:" + id2)
+
+    ses.loadExtension(join(__dirname, 'ext/fhkphphbadjkepgfljndicmgdlndmoke'))
+    ses.loadExtension(join(__dirname, 'ext/lanfdkkpgfjfdikkncbnojekcppdebfp'))
+    ses.loadExtension(join(__dirname, 'ext/olnbjpaejebpnokblkepbphhembdicik'))
+    ses.loadExtension(join(__dirname, 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
+
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/fhkphphbadjkepgfljndicmgdlndmoke'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/lanfdkkpgfjfdikkncbnojekcppdebfp'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/olnbjpaejebpnokblkepbphhembdicik'))
+    ses.loadExtension(join(app.getAppPath(), '..', 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
+
+    ses.on('will-download', function (e, item, webContents) {
+      item.setSavePath(join(app.getPath("downloads"), item.getFilename()))
+    })
+
+    createWindow()
+  }
 
   async function createWindow() {
     Menu.setApplicationMenu(new Menu())
 
-    const windowOptions = {
+    const windowOptions1 = {
       width: 1080,
       minWidth: 680,
-      title: 'ChatRoulette',
+      title: 'ChatRoulette - 1',
       height: 840,
       icon: join(__dirname, '/icon.png'),
       webPreferences: {
         webSecurity: false,
+        enableRemoteModule: true,
+        partition: "persist:" + id1,
         preload: join(__dirname, 'dist/preload.js')
       }
     }
 
-    mainWindow = new BrowserWindow(windowOptions)
-    mainWindow.loadURL('https://videochatru.com/embed/')
+    const windowOptions2 = {
+      width: 1080,
+      minWidth: 680,
+      title: 'ChatRoulette - 2',
+      height: 840,
+      icon: join(__dirname, '/icon.png'),
+      webPreferences: {
+        webSecurity: false,
+        enableRemoteModule: true,
+        partition: "persist:" + id2,
+        preload: join(__dirname, 'dist/preload.js')
+      }
+    }
 
-    if (dev)
+    mainWindow = new BrowserWindow(windowOptions1)
+    mainWindow.loadURL('https://videochatru.com/embed/?p=1')
+    mainWindow.maximize()
+
+    secondWindow = new BrowserWindow(windowOptions2)
+    secondWindow.loadURL('https://videochatru.com/embed/?p=2')
+    secondWindow.maximize()
+
+
+    if (dev) {
       mainWindow.webContents.openDevTools()
+      secondWindow.webContents.openDevTools()
+    }
 
     try {
       if (process.platform == 'darwin' || process.platform == 'win32') {
         const m = systemPreferences.getMediaAccessStatus('microphone')
         const c = systemPreferences.getMediaAccessStatus('camera')
-        
-        if(m == 'not-determined')
+
+        if (m == 'not-determined')
           await systemPreferences.askForMediaAccess('microphone')
             .catch(console.log)
-    
-        if(c == 'not-determined')
+
+        if (c == 'not-determined')
           await systemPreferences.askForMediaAccess('camera')
             .catch(console.log)
       }
-    }catch(e) {
+    } catch (e) {
       console.log(e)
     }
 
     mainWindow.on('closed', () => {
-      mainWindow = null
+      app.quit()
+    })
+
+    secondWindow.on('closed', () => {
+      app.quit()
     })
   }
 
   app.on('ready', () => {
-    createWindow()
-  })
+    if (id1 == "" || id2 == "") {
+      id1 = 1
+      id2 = 2
+    }
 
-  app.on('window-all-closed', () => {
-    app.quit()
+    ipcMain.on('forWin1', (event, arg) => {
+      mainWindow.webContents.send('forWin1', arg);
+    });
+
+    ipcMain.on('openDevTools1', (event, arg) => {
+      mainWindow.webContents.openDevTools()
+    });
+
+    ipcMain.on('clear1', (event, arg) => {
+      session.fromPartition("persist:" + id1).clearStorageData().then(() => { location.reload() })
+    });
+
+    ipcMain.on('forWin2', (event, arg) => {
+      secondWindow.webContents.send('forWin2', arg);
+    });
+
+    ipcMain.on('openDevTools2', (event, arg) => {
+      secondWindow.webContents.openDevTools()
+    });
+
+    ipcMain.on('clear2', (event, arg) => {
+      session.fromPartition("persist:" + id2).clearStorageData().then(() => { location.reload() })
+    });
+
+    start()
   })
 
   app.on('activate', () => {
     if (mainWindow === null) {
       createWindow()
-    }
-  })
-}
-
-function makeSingleInstance() {
-  if (process.mas) return
-
-  app.requestSingleInstanceLock()
-
-  app.on('second-instance', () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
     }
   })
 }
