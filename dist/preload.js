@@ -14,6 +14,13 @@ window.addEventListener("DOMContentLoaded", function () {
   mapgl = require(join(__dirname, '2gis.js'))
 }, false);
 
+function triggerMouseEvent(node, eventType) {
+  var clickEvent = document.createEvent('MouseEvents');
+  clickEvent.initEvent(eventType, true, true);
+  node.dispatchEvent(clickEvent);
+}
+
+
 // faceapi = require(join(__dirname, 'face-api.min.js'))
 
 // faceapi.env.monkeyPatch({
@@ -410,6 +417,13 @@ function injectControls() {
               ctx.drawImage(document.getElementById("remote-video"), 0, 0, dwncanvas.width, dwncanvas.height);
               downloadImage(dwncanvas.toDataURL('image/jpg'))
               dwncanvas = null
+
+              leftScreen.style.backgroundColor = "#555555"
+              sync()
+              setTimeout(() => {
+                leftScreen.style.backgroundColor = ""
+                sync()
+              }, 500)
             },
           }, [
             createElement('b', {
@@ -427,7 +441,12 @@ function injectControls() {
                 remoteMuted.innerText = "🔊"
               }
 
+              leftMute.style.backgroundColor = "#555555"
               sync()
+              setTimeout(() => {
+                leftMute.style.backgroundColor = ""
+                sync()
+              }, 500)
 
               bridgeSend(JSON.stringify({
                 "mute_status": document.getElementById('remote-video').muted
@@ -447,10 +466,24 @@ function injectControls() {
             id: "leftSkip",
             style: "height:24px",
             onclick: () => {
-              document.getElementsByClassName('buttons__button start-button')[0].click()
+              if (!document.getElementsByClassName('buttons__button start-button')[0].className.includes("disabled")) {
+                document.getElementsByClassName('buttons__button start-button')[0].click()
+                leftSkip.style.backgroundColor = "#555555"
+                sync()
+                setTimeout(() => {
+                  leftSkip.style.backgroundColor = ""
+                  sync()
+                }, 500)
+              }
             },
             oncontextmenu: () => {
               document.getElementsByClassName('buttons__button stop-button')[0].click()
+              leftSkip.style.backgroundColor = "#555555"
+              sync()
+              setTimeout(() => {
+                leftSkip.style.backgroundColor = ""
+                sync()
+              }, 500)
             }
           }, [
             createElement('b', {
@@ -699,11 +732,24 @@ function injectControls() {
               bridgeSend(JSON.stringify({
                 "command": "next"
               }));
+
+              rightSkip.style.backgroundColor = "#555555"
+              sync()
+              setTimeout(() => {
+                rightSkip.style.backgroundColor = ""
+                sync()
+              }, 500)
             },
             oncontextmenu: () => {
               bridgeSend(JSON.stringify({
                 "command": "stop"
               }));
+              rightSkip.style.backgroundColor = "#555555"
+              sync()
+              setTimeout(() => {
+                rightSkip.style.backgroundColor = ""
+                sync()
+              }, 500)
             }
           }, [
             createElement('b', {
@@ -722,7 +768,12 @@ function injectControls() {
                 "command": "mute"
               }));
 
+              rightMute.style.backgroundColor = "#555555"
               sync()
+              setTimeout(() => {
+                rightMute.style.backgroundColor = ""
+                sync()
+              }, 500)
             },
           }, [
             createElement('b', {
@@ -738,6 +789,13 @@ function injectControls() {
               bridgeSend(JSON.stringify({
                 "command": "screen"
               }));
+
+              rightScreen.style.backgroundColor = "#555555"
+              sync()
+              setTimeout(() => {
+                rightScreen.style.backgroundColor = ""
+                sync()
+              }, 500)
             },
           }, [
             createElement('b', {
@@ -1037,11 +1095,6 @@ function injectControls() {
   pId = parseInt(document.URL.replace(/^\D+/g, ''))
   opId = 1 + 2 - pId
 
-  function triggerMouseEvent(node, eventType) {
-    var clickEvent = document.createEvent('MouseEvents');
-    clickEvent.initEvent(eventType, true, true);
-    node.dispatchEvent(clickEvent);
-  }
 
   function sync() {
     let payload = {
@@ -1051,12 +1104,18 @@ function injectControls() {
         "remoteMuted": remoteMuted.innerText
       },
       "backgroundColor": {
+        "leftScreen": leftScreen.style.backgroundColor,
+        "leftMute": leftMute.style.backgroundColor,
+        "leftSkip": leftSkip.style.backgroundColor,
         "leftDiscord": leftDiscord.style.backgroundColor,
         "leftMusic": leftMusic.style.backgroundColor,
         "leftMic": leftMic.style.backgroundColor,
         "rightMic": rightMic.style.backgroundColor,
         "rightMusic": rightMusic.style.backgroundColor,
-        "rightDiscord": rightDiscord.style.backgroundColor
+        "rightDiscord": rightDiscord.style.backgroundColor,
+        "rightSkip": rightSkip.style.backgroundColor,
+        "rightMute": rightMute.style.backgroundColor,
+        "rightScreen": rightScreen.style.backgroundColor,
       }
     }
 
@@ -1582,22 +1641,16 @@ document.addEventListener('keyup', e => {
 
   switch (e.key) {
     case "ArrowLeft":
-      document.getElementsByClassName('buttons__button start-button')[0].click()
+      leftSkip.click()
       break;
 
     case "ArrowRight":
-
-      bridgeSend(JSON.stringify({
-        "command": "next"
-      }));
+      rightSkip.click()
       break;
 
     case "ArrowUp":
-      document.getElementsByClassName('buttons__button stop-button')[0].click()
-
-      bridgeSend(JSON.stringify({
-        "command": "stop"
-      }));
+      triggerMouseEvent(leftSkip, "contextmenu");
+      triggerMouseEvent(rightSkip, "contextmenu");
       break;
 
     case "ArrowDown":
