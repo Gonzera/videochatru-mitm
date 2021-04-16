@@ -1,0 +1,397 @@
+<html>
+
+<head>
+  <title>videochatru-mitm remote control</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <style>
+    * {
+      font-family: "Trebuchet MS", sans-serif;
+    }
+
+    button {
+      height: 24px
+    }
+  </style>
+
+  <script type="text/javascript">
+
+    var host = 1
+
+    function toObject(from = {}, to = {}) {
+      for (let key in from) {
+        let value = from[key]
+
+        if (typeof value === 'object' && value && !Array.isArray(value)) {
+          toObject(value, from[key])
+          continue
+        }
+
+        to[key] = value
+      }
+    }
+
+    /**
+     * @param {string} tagName 
+     * @param {Partial<HTMLElement> & {ref(v: HTMLDivElement) => void}} options 
+     * @param {HTMLElement[]} childs 
+     */
+    function createElement(tagName = '', options = {}, childs = []) {
+      const element = document.createElement(tagName)
+
+      toObject(options, element)
+
+      for (let child of childs)
+        element.appendChild(child)
+
+      if (typeof options.ref == 'function')
+        options.ref(element)
+
+      return element
+    }
+
+
+
+    function injectControls() {
+      controls = createElement('center', {
+        style: "position: absolute; width:500px; top:0px; user-select: none;"
+      }, [
+        createElement('div', {
+          id: "left",
+          style: "position:absolute; left:0; top:0;",
+        }, [
+          createElement('button', {
+            id: "leftScreen",
+          }, [
+            createElement('b', {
+              innerText: "📥"
+            })
+          ]),
+          createElement('button', {
+            id: "leftMute",
+          }, [
+            createElement('b', {
+              id: "remoteMuted",
+              innerText: "🔊"
+            })
+          ]),
+          createElement('button', {
+            id: "leftSkip",
+          }, [
+            createElement('b', {
+              innerText: "⏩"
+            })
+          ]),
+        ]),
+        createElement('div', {
+          style: `  display: block;
+          margin-left: auto;
+          margin-right: auto;`,
+          id: "main"
+        }, [
+          createElement('button', {
+            id: "leftDiscord",
+          }, [
+            createElement('b', {
+              innerText: "🤡"
+            })
+          ]),
+          createElement('button', {
+            id: "leftMusic",
+          }, [
+            createElement('b', {
+              innerText: "🎵"
+            })
+          ]),
+          createElement('b', {
+            innerText: "videochatru-mitm",
+            style: "display: none",
+            id: "connectionStatus"
+          }),
+          createElement('button', {
+            id: "leftMic",
+          }, [
+            createElement('b', {
+              innerText: "🎤"
+            })
+          ]),
+          createElement('button', {
+            id: "rightMic",
+          }, [
+            createElement('b', {
+              innerText: "🎤"
+            })
+          ]),
+          createElement('button', {
+            id: "rightMusic",
+          }, [
+            createElement('b', {
+              innerText: "🎵"
+            })
+          ]),
+          createElement('button', {
+            id: "rightDiscord",
+          }, [
+            createElement('b', {
+              innerText: "🤡"
+            })
+          ])
+        ]),
+
+        createElement('div', {
+          style: "position:absolute; right:0; top:0;",
+          id: "right"
+        }, [
+          createElement('button', {
+            id: "rightSkip",
+          }, [
+            createElement('b', {
+              innerText: "⏪"
+            })
+          ]),
+          createElement('button', {
+            id: "rightMute"
+          }, [
+            createElement('b', {
+              id: "localMuted",
+              innerText: "🔊"
+            })
+          ]),
+          createElement('button', {
+            id: "rightScreen"
+          }, [
+            createElement('b', {
+              innerText: "📥"
+            })
+          ]),
+        ]),
+      ])
+
+      description = createElement('div', {
+        innerHTML: `</br><b>Горячие клавиши:</b>
+<ul>
+  <li><b>PAGE UP</b> — наложить звук из дискорда на аудио, идущее от левого</li>
+  <li><b>PAGE DOWN</b> — наложить звук из дискорда на аудио, идущее от правого</li>
+  <li>⬆️ — стоп для всех</li>
+  <li>➡️ — скипнуть правого</li>
+  <li>⬅️ — скипнуть левого</li>
+  <li>⬇️ — сделать скриншот левого и правого</li>
+</ul>
+<b>Удаленное управление:</b>
+<ul>
+  <li><b>📥 — сделать скриншот левого</b></li>
+  <li><b>🔊 — отключить звук левого</b></li>
+  <ul>
+    <li>ПКМ — вкл/выкл трансляцию звука хосту</li>
+  </ul>
+  <li><b>⏩ — скипнуть левого</b></li>
+  <ul>
+    <li>ПКМ — стоп левого</li>
+  </ul>
+  <li><b>🤡 — наложить звук из дискорда на аудио, идущее от левого</b></li>
+  <ul>
+    <li>ЛКМ — push-to-talk</li>
+    <li>ПКМ — toggle</li>
+  </ul>
+  <li><b>🎵 — наложить звук из плеера на аудио, идущее от левого</b></li>
+  <ul>
+    <li>ПКМ — вкл/выкл трансляцию звука из плеера в дискорд</li>
+  </ul>
+  <li><b>🎤 — наложить звук из микро хоста на аудио, идущее от левого</b></li>
+  <ul>
+    <li>ЛКМ — push-to-talk</li>
+    <li>ПКМ — toggle</li>
+  </ul>
+  <li><b>🎤 — наложить звук из микро хоста на аудио, идущее от правого</b></li>
+  <ul>
+    <li>ЛКМ — push-to-talk</li>
+    <li>ПКМ — toggle</li>
+  </ul>
+  <li><b>🎵 — наложить звук из плеера на аудио, идущее от правого</b></li>
+  <ul>
+    <li>ПКМ — Вкл/выкл трансляцию звука из плеера в дискорд</li>
+  </ul>
+  <li><b>🤡 — наложить звук из дискорда на аудио, идущее от правого</b></li>
+  <ul>
+    <li>ЛКМ — push-to-talk</li>
+    <li>ПКМ — toggle</li>
+  </ul>
+  <li><b>⏩ — скипнуть правого</b></li>
+  <ul>
+    <li>ПКМ — стоп правого</li>
+  </ul>
+  <li><b>🔊 — отключить звук правого</b></li>
+  <ul>
+    <li>ПКМ — вкл/выкл трансляцию звука хосту</li>
+  </ul>
+  <li><b>📥 — сделать скриншот правого</b></li>
+</ul>
+        `,
+        style: "margin-top:30px"
+      })
+      document.getElementsByTagName("body")[0].appendChild(controls)
+      document.getElementsByTagName("body")[0].appendChild(description)
+
+
+      function syncEvent(e) {
+        if (e.type == "mouseup" || e.type == "mousedown")
+          if (e.button != 0) {
+            e.preventDefault()
+            return
+          }
+        for (let el of e.path) {
+          if (el.tagName == "BUTTON") {
+            ws.send(JSON.stringify(
+              {
+                "to": host,
+                "id": el.id,
+                "event": e.type
+              }
+            ))
+            break
+          }
+        }
+        e.preventDefault()
+      }
+
+      for (let item of left.children) {
+        item.addEventListener("click", syncEvent)
+        item.addEventListener("contextmenu", syncEvent)
+      }
+
+      for (let item of right.children) {
+        item.addEventListener("click", syncEvent)
+        item.addEventListener("contextmenu", syncEvent)
+      }
+
+      for (let item of main.children) {
+        item.addEventListener("click", syncEvent)
+        item.addEventListener("mousedown", syncEvent)
+        item.addEventListener("mouseup", syncEvent)
+        item.addEventListener("contextmenu", syncEvent)
+      }
+    }
+
+    var ws;
+
+    function init() {
+
+      // Connect to Web Socket
+      ws = new WebSocket("ws://qrlk.me:5555/");
+
+      // Set event handlers.
+      ws.onopen = function (e) {
+        console.log(e)
+      };
+
+      ws.onmessage = function (e) {
+        let mes = JSON.parse(e.data)
+
+        if (mes["sync"]) {
+          if (mes.sync != host)
+            return
+
+          if (mes.innerText.localMuted == "no") {
+            mes.innerText.localMuted = "🔊"
+          } else {
+            mes.innerText.localMuted = "🔇"
+          }
+
+          if (mes.innerText.remoteMuted == "no") {
+            mes.innerText.remoteMuted = "🔊"
+          } else {
+            mes.innerText.remoteMuted = "🔇"
+          }
+
+          Object.keys(mes["innerText"]).forEach(function (key) {
+            document.getElementById(key).innerText = mes["innerText"][key]
+          });
+
+          Object.keys(mes["backgroundColor"]).forEach(function (key) {
+            document.getElementById(key).style.backgroundColor = mes["backgroundColor"][key]
+          });
+        }
+      };
+
+      ws.onclose = function (e) {
+        console.log(e)
+      };
+
+      ws.onerror = function (e) {
+        console.log(e)
+      };
+    }
+
+    function triggerMouseEvent(node, eventType) {
+      var clickEvent = document.createEvent('MouseEvents');
+      clickEvent.initEvent(eventType, true, true);
+      node.dispatchEvent(clickEvent);
+    }
+
+    function injectKeys() {
+      document.addEventListener('keydown', e => {
+        switch (e.key) {
+          case "PageDown":
+            triggerMouseEvent(rightDiscord, "mousedown");
+            e.preventDefault()
+            break;
+
+          case "PageUp":
+            triggerMouseEvent(leftDiscord, "mousedown");
+            e.preventDefault()
+            break;
+        }
+      });
+
+      document.addEventListener('keyup', e => {
+        switch (e.key) {
+          case "ArrowLeft":
+            leftSkip.click()
+            e.preventDefault()
+            break;
+
+          case "ArrowRight":
+            rightSkip.click()
+            e.preventDefault()
+            break;
+
+          case "ArrowUp":
+            triggerMouseEvent(leftSkip, "contextmenu");
+            triggerMouseEvent(rightSkip, "contextmenu");
+            e.preventDefault()
+            break;
+
+          case "ArrowDown":
+            leftScreen.click()
+            rightScreen.click()
+            e.preventDefault()
+            break;
+
+          case "PageDown":
+            triggerMouseEvent(rightDiscord, "mouseup");
+            e.preventDefault()
+            break;
+
+          case "PageUp":
+            triggerMouseEvent(leftDiscord, "mouseup");
+            e.preventDefault()
+            break;
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+      init()
+      injectControls()
+      injectKeys()
+    }, false);
+
+  </script>
+
+</head>
+
+<body>
+</body>
+
+</html>
