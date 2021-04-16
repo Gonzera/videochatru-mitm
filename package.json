@@ -44,6 +44,8 @@
     "copyright": "WSV",
     "files": [
       "dist/preload.js",
+      "dist/2gis.js",
+      "dist/osk.js",
       "main.js",
       "icon.png"
     ],
@@ -71,6 +73,7 @@
   "dependencies": {
     "electron-peer-connection": "^1.0.6",
     "electron-prompt": "^1.6.2",
-    "electron-shortcuts": "^0.4.0"
+    "electron-shortcuts": "^0.4.0",
+    "voicemeeter-connector": "^1.0.2"
   }
 }
