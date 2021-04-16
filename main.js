@@ -14,6 +14,32 @@ if (process.platform == 'linux') {
 let id1 = app.commandLine.getSwitchValue("id1")
 let id2 = app.commandLine.getSwitchValue("id2")
 
+const { Voicemeeter, StripProperties } = require("voicemeeter-connector");
+
+Voicemeeter.init().then(async (vm_cl) => {
+  // Connect to your voicemeeter client
+  vm_cl.connect();
+  vm = vm_cl
+  vm.setStripParameter(4, StripProperties.A4, 0)
+  vm.setStripParameter(4, StripProperties.Gain, -5.0)
+  vm.setStripParameter(0, StripProperties.A1, 1)
+  vm.setStripParameter(4, StripProperties.A5, 0)
+  vm.setStripParameter(4, StripProperties.Gain, -5.0)
+  vm.setStripParameter(1, StripProperties.A1, 1)
+  vm.setStripParameter(7, StripProperties.A4, 0)
+  vm.setStripParameter(7, StripProperties.A1, 1)
+  vm.setStripParameter(7, StripProperties.A5, 0)
+  vm.setStripParameter(7, StripProperties.A1, 1)
+  vm.setStripParameter(3, StripProperties.A4, 0)
+  vm.setStripParameter(3, StripProperties.A1, 1)
+  vm.setStripParameter(3, StripProperties.A5, 0)
+  vm.setStripParameter(3, StripProperties.A1, 1)
+  vm.setStripParameter(0, StripProperties.A1, 1)
+  vm.setStripParameter(1, StripProperties.A1, 1)
+  vm.setStripParameter(3, StripProperties.A2, 0)
+});
+
+
 async function initialize() {
   function start() {
     console.log("persist:" + id2)
@@ -30,7 +56,7 @@ async function initialize() {
     ses.loadExtension(join(app.getAppPath(), '..', 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
 
     ses.on('will-download', function (e, item, webContents) {
-      item.setSavePath(join(app.getPath("downloads"), item.getFilename()))
+      item.setSavePath(join(app.getPath("downloads"), "videochatru", item.getFilename()))
     })
 
     ses = session.fromPartition("persist:" + id2)
@@ -115,10 +141,12 @@ async function initialize() {
     }
 
     mainWindow.on('closed', () => {
+      vm.disconnect();
       app.quit()
     })
 
     secondWindow.on('closed', () => {
+      vm.disconnect();
       app.quit()
     })
   }
@@ -129,8 +157,149 @@ async function initialize() {
       id2 = 2
     }
 
+    function PTT_A(enable) {
+      if (enable) {
+        vm.setStripParameter(4, StripProperties.A4, 1)
+        vm.setStripParameter(4, StripProperties.Gain, 0)
+        vm.setStripParameter(0, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(4, StripProperties.A4, 0)
+        vm.setStripParameter(4, StripProperties.Gain, -5.0)
+        vm.setStripParameter(0, StripProperties.A1, 1)
+      }
+    }
+
+    function PTT_B(enable) {
+      if (enable) {
+        vm.setStripParameter(4, StripProperties.A5, 1)
+        vm.setStripParameter(4, StripProperties.Gain, 0)
+        vm.setStripParameter(1, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(4, StripProperties.A5, 0)
+        vm.setStripParameter(4, StripProperties.Gain, -5.0)
+        vm.setStripParameter(1, StripProperties.A1, 1)
+      }
+    }
+
+    function DPTT_A(enable) {
+      if (enable) {
+        vm.setStripParameter(7, StripProperties.A4, 1)
+        vm.setStripParameter(7, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(7, StripProperties.A4, 0)
+        vm.setStripParameter(7, StripProperties.A1, 1)
+      }
+    }
+
+    function DPTT_B(enable) {
+      if (enable) {
+        vm.setStripParameter(7, StripProperties.A5, 1)
+        vm.setStripParameter(7, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(7, StripProperties.A5, 0)
+        vm.setStripParameter(7, StripProperties.A1, 1)
+      }
+    }
+
+    function MUSIC_A(enable) {
+      if (enable) {
+        vm.setStripParameter(3, StripProperties.A4, 1)
+        vm.setStripParameter(3, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(3, StripProperties.A4, 0)
+        vm.setStripParameter(3, StripProperties.A1, 1)
+      }
+    }
+
+    function MUSIC_B(enable) {
+      if (enable) {
+        vm.setStripParameter(3, StripProperties.A5, 1)
+        vm.setStripParameter(3, StripProperties.A1, 0)
+      } else {
+        vm.setStripParameter(3, StripProperties.A5, 0)
+        vm.setStripParameter(3, StripProperties.A1, 1)
+      }
+    }
+
+    function SWITCH_A() {
+      if (vm.getStripParameter(0, StripProperties.A1) == 0) {
+        vm.setStripParameter(0, StripProperties.A1, 1)
+      } else {
+        vm.setStripParameter(0, StripProperties.A1, 0)
+      }
+    }
+
+    function SWITCH_B() {
+      if (vm.getStripParameter(1, StripProperties.A1) == 0) {
+        vm.setStripParameter(1, StripProperties.A1, 1)
+      } else {
+        vm.setStripParameter(1, StripProperties.A1, 0)
+      }
+    }
+
+    function SWITCH_DISCORD() {
+      if (vm.getStripParameter(3, StripProperties.A2) == 0) {
+        vm.setStripParameter(3, StripProperties.A2, 1)
+      } else {
+        vm.setStripParameter(3, StripProperties.A2, 0)
+      }
+    }
+
+    ipcMain.on('SWITCH_DISCORD', (event, arg) => {
+      SWITCH_DISCORD()
+    });
+
+
+    ipcMain.on('SWITCH_A', (event, arg) => {
+      SWITCH_A()
+    });
+
+    ipcMain.on('SWITCH_B', (event, arg) => {
+      SWITCH_B()
+    });
+
+    ipcMain.on('PTT_A', (event, arg) => {
+      PTT_A(arg)
+      mainWindow.webContents.send('PTT_A', arg);
+      secondWindow.webContents.send('PTT_A', arg);
+    });
+
+    ipcMain.on('PTT_B', (event, arg) => {
+      PTT_B(arg)
+      mainWindow.webContents.send('PTT_B', arg);
+      secondWindow.webContents.send('PTT_B', arg);
+    });
+
+    ipcMain.on('DPTT_A', (event, arg) => {
+      DPTT_A(arg)
+      mainWindow.webContents.send('DPTT_A', arg);
+      secondWindow.webContents.send('DPTT_A', arg);
+    });
+
+    ipcMain.on('DPTT_B', (event, arg) => {
+      DPTT_B(arg)
+      mainWindow.webContents.send('DPTT_B', arg);
+      secondWindow.webContents.send('DPTT_B', arg);
+    });
+
+    ipcMain.on('MUSIC_A', (event, arg) => {
+      MUSIC_A(arg)
+      mainWindow.webContents.send('MUSIC_A', arg);
+      secondWindow.webContents.send('MUSIC_A', arg);
+    });
+
+    ipcMain.on('MUSIC_B', (event, arg) => {
+      MUSIC_B(arg)
+      mainWindow.webContents.send('MUSIC_B', arg);
+      secondWindow.webContents.send('MUSIC_B', arg);
+    });
+
     ipcMain.on('forWin1', (event, arg) => {
       mainWindow.webContents.send('forWin1', arg);
+    });
+
+    ipcMain.on('dc1', (event, arg) => {
+      mainWindow.webContents.send('dc1', arg);
     });
 
     ipcMain.on('openDevTools1', (event, arg) => {
@@ -143,6 +312,10 @@ async function initialize() {
 
     ipcMain.on('forWin2', (event, arg) => {
       secondWindow.webContents.send('forWin2', arg);
+    });
+
+    ipcMain.on('dc2', (event, arg) => {
+      secondWindow.webContents.send('dc2', arg);
     });
 
     ipcMain.on('openDevTools2', (event, arg) => {

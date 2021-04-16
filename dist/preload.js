@@ -1,4 +1,19 @@
 const { join } = require('path')
+
+require(join(__dirname, 'osk.js'))
+
+function random_female() {
+  return osk_adj_female[Math.floor(Math.random() * osk_adj_female.length)] + ' ' + osk_female[Math.floor(Math.random() * osk_female.length)]
+}
+
+function random_male() {
+  return osk_adj_male[Math.floor(Math.random() * osk_adj_male.length)] + ' ' + osk_male[Math.floor(Math.random() * osk_male.length)]
+}
+
+window.addEventListener("DOMContentLoaded", function () {
+  mapgl = require(join(__dirname, '2gis.js'))
+}, false);
+
 // faceapi = require(join(__dirname, 'face-api.min.js'))
 
 // faceapi.env.monkeyPatch({
@@ -9,6 +24,14 @@ const { join } = require('path')
 //   createCanvasElement: () => document.createElement('canvas'),
 //   createImageElement: () => document.createElement('img')
 // });
+
+function bridgeSend(message) {
+  if (pId == 1) {
+    ipcRenderer.send('dc2', message);
+  } else {
+    ipcRenderer.send('dc1', message);
+  }
+}
 
 Object.defineProperty(window, 'FCN', {
   get() {
@@ -231,7 +254,7 @@ async function runDevices(/** @type {HTMLDivElement} */ frame) {
     }
 
     try {
-      if ((stage == 2) && (found + 6000 < Date.now())) {
+      if ((stage == 2) && (found + 4000 < Date.now())) {
         console.dir("Skipping due to loading time limit")
         document.getElementsByClassName('buttons__button start-button')[0].click()
       }
@@ -241,21 +264,21 @@ async function runDevices(/** @type {HTMLDivElement} */ frame) {
 
     try {
       if (document.getElementsByClassName("video-warning__btn")[0].firstElementChild.offsetParent != null) {
-        if (typeof dc !== 'undefined' && dc.readyState == "open") {
-          dc.send(JSON.stringify({
-            "command": "stop"
-          }));
-        }
+
+        bridgeSend(JSON.stringify({
+          "command": "stop"
+        }));
+
 
         document.getElementsByClassName("video-warning__btn")[0].firstElementChild.click()
 
         setTimeout(function () {
           if (document.getElementsByClassName("video-warning__btn")[0].firstElementChild.offsetParent == null) {
-            if (typeof dc !== 'undefined' && dc.readyState == "open") {
-              dc.send(JSON.stringify({
-                "command": "next"
-              }));
-            }
+
+            bridgeSend(JSON.stringify({
+              "command": "next"
+            }));
+
           }
         }, 500)
       }
@@ -265,11 +288,11 @@ async function runDevices(/** @type {HTMLDivElement} */ frame) {
 
     try {
       if ($("#ban-popup")[0].style.display === "block") {
-        if (typeof dc !== 'undefined' && dc.readyState === "open") {
-          dc.send(JSON.stringify({
-            "command": "stop"
-          }));
-        }
+
+        bridgeSend(JSON.stringify({
+          "command": "stop"
+        }));
+
       }
     } catch (e) {
       console.log(e)
@@ -284,15 +307,17 @@ async function runDevices(/** @type {HTMLDivElement} */ frame) {
 }
 
 function downloadImage(data) {
+  if (data == "data:,")
+    return
   let a = document.createElement('a');
   a.href = data;
 
   let current = new Date();
   let cDate = current.getFullYear() + '-' + (current.getMonth() + 1) + '-' + current.getDate();
-  let cTime = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds();
+  let cTime = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds() + "-" + current.getMilliseconds();
   let dateTime = cDate + ' ' + cTime;
 
-  a.download = dateTime;
+  a.download = "videochatru_" + dateTime;
   document.body.appendChild(a);
   a.click();
 };
@@ -301,7 +326,7 @@ function injectControls() {
   controls = createElement('div', {
     className: 'chat',
     id: 'controls',
-    style: "width:500px; margin-right: calc(100vh / 768 * 10);"
+    style: "width:450px; margin-right: calc(100vh / 768 * 10);"
   }, [
     createElement('div', {
       className: "tabs chat"
@@ -366,12 +391,15 @@ function injectControls() {
           clear: both;
         }`
       }),
-      createElement('center', {}, [
+      createElement('center', {
+        style: "height: 24px; user-select: none; margin-bottom:2px"
+      }, [
         createElement('div', {
-          style: "position:absolute; left:0;top:0",
+          style: "position:absolute; left:0; top:0;",
         }, [
           createElement('button', {
-            style: "color: red; height:15px",
+            id: "leftScreen",
+            style: "color: red; height:24px",
             onclick: () => {
               let dwncanvas = document.createElement('canvas');
               dwncanvas.width = document.getElementById('remote-video').videoWidth
@@ -385,55 +413,335 @@ function injectControls() {
             },
           }, [
             createElement('b', {
-              innerText: "^"
+              innerText: "📥"
             })
           ]),
           createElement('button', {
-            style: "margin-right: 20px; color: green; height:15px",
+            style: "height:24px",
+            id: "leftMute",
+            onclick: () => {
+              document.getElementById('remote-video').muted = !document.getElementById('remote-video').muted
+              if (document.getElementById('remote-video').muted) {
+                remoteMuted.innerText = "🔇"
+              } else {
+                remoteMuted.innerText = "🔊"
+              }
+
+              sync()
+
+              bridgeSend(JSON.stringify({
+                "mute_status": document.getElementById('remote-video').muted
+              }));
+            },
+            oncontextmenu: () => {
+              ipcRenderer.send('SWITCH_A', true);
+              ipcRenderer.send('SWITCH_B', true);
+            }
+          }, [
+            createElement('b', {
+              id: "remoteMuted",
+              innerText: "🔊"
+            })
+          ]),
+          createElement('button', {
+            id: "leftSkip",
+            style: "height:24px",
             onclick: () => {
               document.getElementsByClassName('buttons__button start-button')[0].click()
             },
+            oncontextmenu: () => {
+              document.getElementsByClassName('buttons__button stop-button')[0].click()
+            }
           }, [
             createElement('b', {
-              innerText: "^"
+              innerText: "⏩"
             })
           ]),
         ]),
-
-        createElement('b', {
-          innerText: "videochatru-mitm",
-          id: "connectionStatus"
-        }),
-
         createElement('div', {
-          style: "position:absolute; right:0;top:0",
+          style: `  display: block;
+          margin-left: auto;
+          margin-right: auto;`
         }, [
           createElement('button', {
-            style: "margin-left: 20px; color: green; height:15px",
-            onclick: () => {
-              if (typeof dc !== 'undefined' && dc.readyState == "open") {
-                dc.send(JSON.stringify({
-                  "command": "next"
-                }));
+            style: "height:24px",
+            id: "leftDiscord",
+            onmousedown: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('DPTT_A', true);
+                } else {
+                  ipcRenderer.send('DPTT_B', true);
+                }
               }
             },
+            onmouseup: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('DPTT_A', false);
+                } else {
+                  ipcRenderer.send('DPTT_B', false);
+                }
+              }
+            },
+            oncontextmenu: () => {
+              if (pId == 1) {
+                if (leftDiscord.style.backgroundColor) {
+                  ipcRenderer.send('DPTT_A', false);
+                } else {
+                  ipcRenderer.send('DPTT_A', true);
+                }
+              } else {
+                if (leftDiscord.style.backgroundColor) {
+                  ipcRenderer.send('DPTT_B', false);
+                } else {
+                  ipcRenderer.send('DPTT_B', true);
+                }
+              }
+            }
           }, [
             createElement('b', {
-              innerText: "^"
+              innerText: "🤡"
             })
           ]),
           createElement('button', {
-            style: "color: red; height:15px",
+            style: "height:24px",
+            id: "leftMusic",
             onclick: () => {
-              if (typeof dc !== 'undefined' && dc.readyState == "open") {
-                dc.send(JSON.stringify({
-                  "command": "screen"
-                }));
+              if (pId == 1) {
+                if (leftMusic.style.backgroundColor) {
+                  ipcRenderer.send('MUSIC_A', false);
+                } else {
+                  ipcRenderer.send('MUSIC_A', true);
+                }
+              } else {
+                if (leftMusic.style.backgroundColor) {
+                  ipcRenderer.send('MUSIC_B', false);
+                } else {
+                  ipcRenderer.send('MUSIC_B', true);
+                }
               }
+            },
+            oncontextmenu: () => {
+              ipcRenderer.send('SWITCH_DISCORD', true);
             },
           }, [
             createElement('b', {
-              innerText: "^"
+              innerText: "🎵"
+            })
+          ]),
+          createElement('b', {
+            innerText: "videochatru-mitm",
+            style: "display: none",
+            id: "connectionStatus"
+          }),
+          createElement('button', {
+            style: "height:24px;",
+            id: "leftMic",
+            onmousedown: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('PTT_A', true);
+                } else {
+                  ipcRenderer.send('PTT_B', true);
+                }
+              }
+            },
+            onmouseup: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('PTT_A', false);
+                } else {
+                  ipcRenderer.send('PTT_B', false);
+                }
+              }
+            },
+            oncontextmenu: () => {
+              if (pId == 1) {
+                if (leftMic.style.backgroundColor) {
+                  ipcRenderer.send('PTT_A', false);
+                } else {
+                  ipcRenderer.send('PTT_A', true);
+                }
+              } else {
+                if (leftMic.style.backgroundColor) {
+                  ipcRenderer.send('PTT_B', false);
+                } else {
+                  ipcRenderer.send('PTT_B', true);
+                }
+              }
+            }
+          }, [
+            createElement('b', {
+              innerText: "🎤"
+            })
+          ]),
+          createElement('button', {
+            style: "height:24px",
+            id: "rightMic",
+            onmousedown: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('PTT_B', true);
+                } else {
+                  ipcRenderer.send('PTT_A', true);
+                }
+              }
+            },
+            onmouseup: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('PTT_B', false);
+                } else {
+                  ipcRenderer.send('PTT_A', false);
+                }
+              }
+            },
+            oncontextmenu: () => {
+              if (pId == 1) {
+                if (rightMic.style.backgroundColor) {
+                  ipcRenderer.send('PTT_B', false);
+                } else {
+                  ipcRenderer.send('PTT_B', true);
+                }
+              } else {
+                if (rightMic.style.backgroundColor) {
+                  ipcRenderer.send('PTT_A', false);
+                } else {
+                  ipcRenderer.send('PTT_A', true);
+                }
+              }
+            }
+          }, [
+            createElement('b', {
+              innerText: "🎤"
+            })
+          ]),
+          createElement('button', {
+            style: "height:24px",
+            id: "rightMusic",
+            onclick: () => {
+              if (pId == 1) {
+                if (rightMusic.style.backgroundColor) {
+                  ipcRenderer.send('MUSIC_B', false);
+                } else {
+                  ipcRenderer.send('MUSIC_B', true);
+                }
+              } else {
+                if (rightMusic.style.backgroundColor) {
+                  ipcRenderer.send('MUSIC_A', false);
+                } else {
+                  ipcRenderer.send('MUSIC_A', true);
+                }
+              }
+            },
+            oncontextmenu: () => {
+              ipcRenderer.send('SWITCH_DISCORD', true);
+            },
+          }, [
+            createElement('b', {
+              innerText: "🎵"
+            })
+          ]),
+          createElement('button', {
+            style: "height:24px",
+            id: "rightDiscord",
+            onclick: () => {
+              //document.getElementsByClassName('buttons__button start-button')[0].click()
+            },
+            onmousedown: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('DPTT_B', true);
+                } else {
+                  ipcRenderer.send('DPTT_A', true);
+                }
+              }
+            },
+            onmouseup: (e) => {
+              if (e.button == 0) {
+                if (pId == 1) {
+                  ipcRenderer.send('DPTT_B', false);
+                } else {
+                  ipcRenderer.send('DPTT_A', false);
+                }
+              }
+            },
+            oncontextmenu: () => {
+              if (pId == 1) {
+                if (rightDiscord.style.backgroundColor) {
+                  ipcRenderer.send('DPTT_B', false);
+                } else {
+                  ipcRenderer.send('DPTT_B', true);
+                }
+              } else {
+                if (rightDiscord.style.backgroundColor) {
+                  ipcRenderer.send('DPTT_A', false);
+                } else {
+                  ipcRenderer.send('DPTT_A', true);
+                }
+              }
+            }
+          }, [
+            createElement('b', {
+              innerText: "🤡"
+            })
+          ])
+        ]),
+
+        createElement('div', {
+          style: "position:absolute; right:0; top:0;",
+        }, [
+          createElement('button', {
+            id: "rightSkip",
+            style: "height:24px",
+            onclick: () => {
+              bridgeSend(JSON.stringify({
+                "command": "next"
+              }));
+            },
+            oncontextmenu: () => {
+              bridgeSend(JSON.stringify({
+                "command": "stop"
+              }));
+            }
+          }, [
+            createElement('b', {
+              innerText: "⏪"
+            })
+          ]),
+          createElement('button', {
+            style: "height:24px",
+            id: "rightMute",
+            oncontextmenu: () => {
+              ipcRenderer.send('SWITCH_A', true);
+              ipcRenderer.send('SWITCH_B', true);
+            },
+            onclick: () => {
+              bridgeSend(JSON.stringify({
+                "command": "mute"
+              }));
+
+              sync()
+            },
+          }, [
+            createElement('b', {
+              id: "localMuted",
+              innerText: "🔊"
+            })
+          ]),
+          createElement('button', {
+            style: "color: red; height:24px",
+            id: "rightScreen",
+            onclick: () => {
+
+              bridgeSend(JSON.stringify({
+                "command": "screen"
+              }));
+            },
+          }, [
+            createElement('b', {
+              innerText: "📥"
             })
           ]),
         ]),
@@ -446,7 +754,13 @@ function injectControls() {
           innerText: "remote IP"
         }),
         createElement('li', {
-          innerText: "faceapi"
+          innerText: "map1"
+        }),
+        createElement('li', {
+          innerText: "map2"
+        }),
+        createElement('li', {
+          innerText: "osk"
         }),
         createElement('li', {
           innerText: "WebRTC"
@@ -456,7 +770,9 @@ function injectControls() {
         })
       ]),
       createElement('div', {
-        className: "tabs__content active row"
+        className: "tabs__content active row",
+        id: "apiInfoContent",
+        style: "height:100%;"
       }, [
         createElement('div', {
           className: "column",
@@ -469,8 +785,53 @@ function injectControls() {
       ]),
       createElement('div', {
         className: "tabs__content",
+        id: "mapContent1",
+        style: "height:100%;"
+      }, [
+        createElement('div', {
+          id: "mapid1",
+          style: "width: 100%"
+        })
+      ]),
+      createElement('div', {
+        className: "tabs__content",
+        id: "mapContent2",
+        style: "height:100%;"
+      }, [
+        createElement('div', {
+          id: "mapid2",
+          style: "width: 100%"
+        })
+      ]),
+      createElement('div', {
+        className: "tabs__content",
         id: "faceapiContent",
-      }),
+      }, [
+        createElement('button', {
+          id: "maleOsk",
+          onclick: () => {
+            maleOskText.innerText = random_male()
+          },
+        }, [
+          createElement('b', {
+            id: "maleOskText",
+            innerText: "мужской род"
+          })
+        ]),
+        createElement('br'),
+        createElement('br'),
+        createElement('button', {
+          id: "femaleOsk",
+          onclick: () => {
+            femaleOskText.innerText = random_female()
+          },
+        }, [
+          createElement('b', {
+            id: "femaleOskText",
+            innerText: "женский род"
+          })
+        ])
+      ]),
       createElement('div', {
         className: "tabs__content",
         id: "setupRTC",
@@ -503,17 +864,231 @@ function injectControls() {
     ])
   ])
 
+  buttonsDiv = $(".buttons")[0]
+  chatDiv = $(".chat")[0]
 
   $(controls).insertBefore(".chat");
+  $(".buttons")[0].style.marginLeft = "14px"
+
+  resize = false
+
+  setInterval(() => {
+    if (typeof localTZ !== 'undefined' && typeof localTime !== 'undefined') {
+      localTime.innerText = new Date().toLocaleTimeString("ru", { timeZone: localTZ.innerText }).slice(0, -3)
+    }
+    if (typeof remoteTZ !== 'undefined' && typeof remoteTime !== 'undefined') {
+      remoteTime.innerText = new Date().toLocaleTimeString("ru", { timeZone: remoteTZ.innerText }).slice(0, -3)
+    }
+  }, 1000)
+
+  map1 = new mapgl.Map('mapid1', {
+    center: [39.2610736084446, 54.39525286954687],
+    zoom: 10,
+    lang: "ru",
+    key: 'bfd8bbca-8abf-11ea-b033-5fa57aae2de7',
+    style: 'c080bb6a-8134-4993-93a1-5b4d8c36a59b'
+  });
+
+  map2 = new mapgl.Map('mapid2', {
+    center: [39.2610736084446, 54.39525286954687],
+    zoom: 10,
+    lang: "ru",
+    key: 'bfd8bbca-8abf-11ea-b033-5fa57aae2de7',
+    style: 'c080bb6a-8134-4993-93a1-5b4d8c36a59b'
+  });
+
+  function resizemap() {
+    mapid1.style.height = $("#mapContent1")[0].offsetHeight - $(".tabs__caption")[0].offsetHeight + "px"
+    mapid2.style.height = $("#mapContent2")[0].offsetHeight - $(".tabs__caption")[0].offsetHeight + "px"
+
+    remoteInfo.style.height = $("#apiInfoContent")[0].offsetHeight - $(".tabs__caption")[0].offsetHeight + "px"
+
+    map1.invalidateSize()
+    map2.invalidateSize()
+  }
+
+  function outputsize() {
+    resizemap()
+
+    if (!resize) {
+      resize = true
+      setTimeout(() => {
+        let mar = parseInt(window.getComputedStyle(controls).marginRight)
+        buttonsDiv.style.width = (parseInt(buttonsDiv.style.width) - (parseInt(controls.style.width) + mar) / 2) + "px"
+        chatDiv.style.width = (parseInt(chatDiv.style.width) - (parseInt(controls.style.width) + mar) / 2) + "px"
+        resize = false
+      }, 200)
+    }
+  }
+
+  new ResizeObserver(outputsize).observe(document.getElementsByClassName("chat-container")[0])
+
+  ipcRenderer.on('PTT_A', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        leftMic.style.backgroundColor = "#555555"
+      } else {
+        rightMic.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        leftMic.style.backgroundColor = ""
+      } else {
+        rightMic.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
+
+  ipcRenderer.on('PTT_B', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        rightMic.style.backgroundColor = "#555555"
+      } else {
+        leftMic.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        rightMic.style.backgroundColor = ""
+      } else {
+        leftMic.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
+
+  ipcRenderer.on('DPTT_A', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        leftDiscord.style.backgroundColor = "#555555"
+      } else {
+        rightDiscord.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        leftDiscord.style.backgroundColor = ""
+      } else {
+        rightDiscord.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
+
+  ipcRenderer.on('DPTT_B', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        rightDiscord.style.backgroundColor = "#555555"
+      } else {
+        leftDiscord.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        rightDiscord.style.backgroundColor = ""
+      } else {
+        leftDiscord.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
+
+
+  ipcRenderer.on('MUSIC_A', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        leftMusic.style.backgroundColor = "#555555"
+      } else {
+        rightMusic.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        leftMusic.style.backgroundColor = ""
+      } else {
+        rightMusic.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
+
+  ipcRenderer.on('MUSIC_B', (event, arg) => {
+    if (arg) {
+      if (pId == 1) {
+        rightMusic.style.backgroundColor = "#555555"
+      } else {
+        leftMusic.style.backgroundColor = "#555555"
+      }
+    } else {
+      if (pId == 1) {
+        rightMusic.style.backgroundColor = ""
+      } else {
+        leftMusic.style.backgroundColor = ""
+      }
+    }
+    sync()
+  });
 
   $('ul.tabs__caption').on('click', 'li:not(.active)', function () {
     $(this)
       .addClass('active').siblings().removeClass('active')
       .closest('div.tabs').find('div.tabs__content').removeClass('active').eq($(this).index()).addClass('active');
+
+    resizemap()
   });
 
   pId = parseInt(document.URL.replace(/^\D+/g, ''))
   opId = 1 + 2 - pId
+
+  function triggerMouseEvent(node, eventType) {
+    var clickEvent = document.createEvent('MouseEvents');
+    clickEvent.initEvent(eventType, true, true);
+    node.dispatchEvent(clickEvent);
+  }
+
+  function sync() {
+    let payload = {
+      "sync": pId,
+      "innerText": {
+        "localMuted": localMuted.innerText,
+        "remoteMuted": remoteMuted.innerText
+      },
+      "backgroundColor": {
+        "leftDiscord": leftDiscord.style.backgroundColor,
+        "leftMusic": leftMusic.style.backgroundColor,
+        "leftMic": leftMic.style.backgroundColor,
+        "rightMic": rightMic.style.backgroundColor,
+        "rightMusic": rightMusic.style.backgroundColor,
+        "rightDiscord": rightDiscord.style.backgroundColor
+      }
+    }
+
+    if (payload.innerText.localMuted == "🔊") {
+      payload.innerText.localMuted = "no"
+    } else {
+      payload.innerText.localMuted = "yes"
+    }
+
+    if (payload.innerText.remoteMuted == "🔊") {
+      payload.innerText.remoteMuted = "no"
+    } else {
+      payload.innerText.remoteMuted = "yes"
+    }
+
+    ws.send(JSON.stringify(payload))
+  }
+
+  // Connect to Web Socket
+  ws = new WebSocket("ws://qrlk.me:5555/");
+
+  // Set event handlers.
+  ws.onopen = function () {
+    ws.send(JSON.stringify({ "host": pId }));
+  };
+
+  ws.onmessage = function (e) {
+    let mes = JSON.parse(e.data)
+    if (mes["sync"])
+      return
+    triggerMouseEvent(document.getElementById(mes.id), mes.event);
+  };
 
   setupRTC.innerHTML = `
   <video id="leftVideo" playsinline autoplay controls style="display:none"></video>
@@ -554,6 +1129,8 @@ let interval = setInterval(() => {
   document.getElementsByClassName("caption remote-video__info")[0].style.opacity = 0.0
   document.getElementsByClassName("remote-video__watermark")[0].style.opacity = 0.0
   document.getElementsByClassName("pleer")[0].style.opacity = 0.0
+  document.getElementsByClassName("video-container__buttons remote-video__buttons")[0].style.opacity = 0.0
+
   $(".gender-selector")[0].parentElement.remove()
 
   injectControls()
@@ -567,8 +1144,8 @@ let interval = setInterval(() => {
   //   faceapi.nets.faceExpressionNet.loadFromDisk(join(__dirname, 'models')),
   //   faceapi.nets.ageGenderNet.loadFromDisk(join(__dirname, 'models'))
   // ])
-  
-  
+
+
   // function face() {
   //   const canvas = faceapi.createCanvasFromMedia(video);
   //   faceapiContent.append(canvas);
@@ -660,11 +1237,59 @@ let interval = setInterval(() => {
       live = true;
       $("#top-wave").hide()
     };
-    dc.onmessage = mes => {
+    // dc.onmessage = mes => 
+  }
+
+  function createOffer() {
+    pc.onicecandidate = e => {
+      if (live) {
+        sc.send(JSON.stringify({ "candidate": e.candidate }));
+      } else if (!e.candidate) {
+        ipcRenderer.send('forWin2', { "offer": pc.localDescription.sdp });
+      }
+    };
+    dcInit(dc = pc.createDataChannel("chat"));
+    scInit(sc = pc.createDataChannel("signaling"));
+  }
+
+  function bridge(data) {
+    {
       //log("> " + mes.data)
-      mes = JSON.parse(mes.data)
+      mes = JSON.parse(data)
       if (mes["command"]) {
         switch (mes["command"]) {
+          case "mute":
+            document.getElementById('remote-video').muted = !document.getElementById('remote-video').muted
+            if (document.getElementById('remote-video').muted) {
+              remoteMuted.innerText = "🔇"
+            } else {
+              remoteMuted.innerText = "🔊"
+            }
+
+
+            bridgeSend(JSON.stringify({
+              "mute_status": document.getElementById('remote-video').muted
+            }));
+            break;
+
+          case "mute_on":
+            document.getElementById('remote-video').muted = true
+            remoteMuted.innerText = "🔇"
+
+            bridgeSend(JSON.stringify({
+              "mute_status": document.getElementById('remote-video').muted
+            }));
+            break;
+
+          case "mute_off":
+            document.getElementById('remote-video').muted = false
+            remoteMuted.innerText = "🔊"
+
+            bridgeSend(JSON.stringify({
+              "mute_status": document.getElementById('remote-video').muted
+            }));
+            break;
+
           case "stop":
             document.getElementsByClassName('buttons__button stop-button')[0].click()
             break;
@@ -687,6 +1312,15 @@ let interval = setInterval(() => {
         }
       }
 
+      if (typeof mes["mute_status"] !== 'undefined') {
+        if (mes["mute_status"]) {
+          localMuted.innerText = "🔇"
+        } else {
+          localMuted.innerText = "🔊"
+        }
+        sync()
+      }
+
       // if (mes["stage"]) {
       //   if (mes["stage"] === 1) {
       //     remotePreview.removeAttribute("src")
@@ -694,9 +1328,28 @@ let interval = setInterval(() => {
       //remoteStage.innerText = mes["stage"]
       // doAlter.spellcheck = false
       // }
+      if (typeof mes["info"] !== 'undefined') {
+        localInfo.innerHTML = mes["info"].replace("remoteTZ", "localTZ").replace("remoteTime", "localTime")
 
-      if (mes["info"]) {
-        localInfo.innerHTML = mes["info"]
+        if (typeof mes["json"] !== 'undefined') {
+          let json = JSON.parse(mes["json"])
+
+          if (typeof marker2 !== 'undefined')
+            marker2.destroy()
+
+          map2.setCenter([json.lon, json.lat]);
+
+          if (json.mobile) {
+            marker2 = new mapgl.Marker(map2, {
+              coordinates: [json.lon, json.lat],
+              icon: "https://svgur.com/i/WGw.svg"
+            });
+          } else {
+            marker2 = new mapgl.Marker(map2, {
+              coordinates: [json.lon, json.lat],
+            });
+          }
+        }
       }
 
       // if (mes["preview"]) {
@@ -709,17 +1362,6 @@ let interval = setInterval(() => {
     }
   }
 
-  function createOffer() {
-    pc.onicecandidate = e => {
-      if (live) {
-        sc.send(JSON.stringify({ "candidate": e.candidate }));
-      } else if (!e.candidate) {
-        ipcRenderer.send('forWin2', { "offer": pc.localDescription.sdp });
-      }
-    };
-    dcInit(dc = pc.createDataChannel("chat"));
-    scInit(sc = pc.createDataChannel("signaling"));
-  }
 
   if (pId == 1) {
     createOffer()
@@ -729,7 +1371,16 @@ let interval = setInterval(() => {
       var obj = { type: "answer", sdp: arg.answer };
       pc.setRemoteDescription(new RTCSessionDescription(obj)).catch(log);
     });
+
+    ipcRenderer.on('dc1', (event, arg) => {
+      bridge(arg)
+    });
+
   } else {
+    ipcRenderer.on('dc2', (event, arg) => {
+      bridge(arg)
+    });
+
     ipcRenderer.on('forWin2', function (event, arg) {
 
       if (pc.signalingState !== "stable") return;
@@ -790,50 +1441,47 @@ let interval = setInterval(() => {
 
           remoteInfo.innerHTML = ""
 
-          if (typeof dc !== 'undefined' && dc.readyState == "open") {
-            dc.send(JSON.stringify({
-              "stage": 1,
-              "info": remoteInfo.innerHTML
-            }));
-          }
+
+          bridgeSend(JSON.stringify({
+            "stage": 1
+          }));
+
+
+          bridgeSend(JSON.stringify({
+            "info": remoteInfo.innerHTML
+          }));
         } else if (attributeValue.includes("s-found")) {
           stage = 2
 
           found = Date.now()
 
-          if (typeof dc !== 'undefined' && dc.readyState == "open") {
-            dc.send(JSON.stringify({
-              "stage": 2
-            }));
-          }
+
+          bridgeSend(JSON.stringify({
+            "stage": 2
+          }));
         } else if (attributeValue.includes("s-play")) {
           stage = 3
 
           play = Date.now()
-          console.dir("Loading took: ", parseFloat((play - found) / 1000).toFixed(2), "sec")
+          console.dir("Loading took: " + parseFloat((play - found) / 1000).toFixed(2) + " sec")
 
-          if (typeof dc !== 'undefined' && dc.readyState == "open") {
-            dc.send(JSON.stringify({
-              "stage": 3
-            }));
-          }
+
+          bridgeSend(JSON.stringify({
+            "stage": 3
+          }));
         } else if (attributeValue.includes("s-stop")) {
           stage = 0
-          if (typeof dc !== 'undefined' && dc.readyState == "open") {
-            dc.send(JSON.stringify({
-              "stage": 4
-            }));
-          }
 
+          bridgeSend(JSON.stringify({
+            "stage": 4
+          }));
 
           remoteInfo.innerHTML = ""
 
-          if (typeof dc !== 'undefined' && dc.readyState == "open") {
-            dc.send(JSON.stringify({
-              "stage": 1,
-              "info": remoteInfo.innerHTML
-            }));
-          }
+
+          bridgeSend(JSON.stringify({
+            "info": remoteInfo.innerHTML
+          }));
         }
       }
     });
@@ -842,6 +1490,87 @@ let interval = setInterval(() => {
     attributes: true
   });
 }, 300)
+
+
+document.addEventListener('keydown', e => {
+  switch (e.key) {
+    case "PageDown":
+      if (!e.repeat) {
+        if (pId == 1) {
+          ipcRenderer.send('PTT_B', true);
+        } else {
+          ipcRenderer.send('PTT_A', true);
+        }
+        if (e.altKey) {
+          bridgeSend(JSON.stringify({
+            "command": "mute_on"
+          }));
+          unmute_down = true
+        }
+      }
+      e.preventDefault()
+      break;
+
+    case "PageUp":
+      if (!e.repeat) {
+        if (pId == 1) {
+          ipcRenderer.send('PTT_A', true);
+        } else {
+          ipcRenderer.send('PTT_B', true);
+        }
+      }
+
+      if (e.altKey) {
+        document.getElementById('remote-video').muted = true
+        remoteMuted.innerText = "🔇"
+
+        bridgeSend(JSON.stringify({
+          "mute_status": document.getElementById('remote-video').muted
+        }));
+        unmute_up = true
+      }
+      e.preventDefault()
+      break;
+  }
+});
+
+document.addEventListener('keyup', e => {
+  switch (e.key) {
+    case "PageDown":
+      if (pId == 1) {
+        ipcRenderer.send('PTT_B', false);
+      } else {
+        ipcRenderer.send('PTT_A', false);
+      }
+
+      if (unmute_down) {
+        unmute_down = false
+        bridgeSend(JSON.stringify({
+          "command": "mute_off"
+        }));
+      }
+      e.preventDefault()
+      break;
+
+    case "PageUp":
+      if (pId == 1) {
+        ipcRenderer.send('PTT_A', false);
+      } else {
+        ipcRenderer.send('PTT_B', false);
+      }
+      if (unmute_up) {
+        unmute_up = false
+        document.getElementById('remote-video').muted = false
+        remoteMuted.innerText = "🔊"
+
+        bridgeSend(JSON.stringify({
+          "mute_status": document.getElementById('remote-video').muted
+        }));
+      }
+      e.preventDefault()
+      break;
+  }
+});
 
 
 document.addEventListener('keyup', e => {
@@ -857,64 +1586,65 @@ document.addEventListener('keyup', e => {
       break;
 
     case "ArrowRight":
-      if (typeof dc !== 'undefined' && dc.readyState == "open") {
-        dc.send(JSON.stringify({
-          "command": "next"
-        }));
-      }
+
+      bridgeSend(JSON.stringify({
+        "command": "next"
+      }));
       break;
 
     case "ArrowUp":
       document.getElementsByClassName('buttons__button stop-button')[0].click()
 
-      if (typeof dc !== 'undefined' && dc.readyState == "open") {
-        dc.send(JSON.stringify({
-          "command": "stop"
-        }));
-      }
+      bridgeSend(JSON.stringify({
+        "command": "stop"
+      }));
       break;
 
     case "ArrowDown":
-      let dwncanvas = document.createElement('canvas');
-      dwncanvas.width = document.getElementById('remote-video').videoWidth
-      dwncanvas.height = document.getElementById('remote-video').videoHeight
-
-      var ctx = dwncanvas.getContext('2d');
-
-      ctx.drawImage(document.getElementById("remote-video"), 0, 0, dwncanvas.width, dwncanvas.height);
-      downloadImage(dwncanvas.toDataURL('image/jpg'))
-      dwncanvas = null
-
-      if (typeof dc !== 'undefined' && dc.readyState == "open") {
-        dc.send(JSON.stringify({
-          "command": "screen"
-        }));
-      }
+      leftScreen.click()
+      rightScreen.click()
       break;
   }
 });
 
 function updateRemoteAddress(remoteAddress) {
-  $.getJSON("http://ip-api.com/json/" + remoteAddress, { lang: "ru", fields: "status,message,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,isp,org,as,mobile,proxy,hosting,query" })
+  $.getJSON("http://ip-api.com/json/" + remoteAddress.replace("[", "").replace("]", ""), { lang: "ru", fields: "status,message,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,isp,org,as,mobile,proxy,hosting,query" })
     .done(function (json) {
-      remoteInfo.innerHTML = "<b>Страна: </b>" + json.country + " [" + json.countryCode + "] </br>" +
-        "</br>" +
-        "<b>Город: </b>" + json.city + " (" + json.region + ") </br>" +
-        "<b>Регион: </b>" + json.regionName + "</br>" +
-        "<b>TZ: </b>" + json.timezone + "</br>" +
-        "</br>" +
-        "<b>IP: </b>" + json.query + "</br>" +
-        "</br>" +
-        "<b>Mobile web: </b>" + json.mobile + "</br>" +
-        //"<b>Провайдер: </b>" + json.isp + " </br>" +
-        //"</br>" +
-        "<b>VPN: </b>" + json.proxy + " || <b>VPS: </b>" + json.hosting
+      if (typeof marker1 !== 'undefined')
+        marker1.destroy()
 
-      if (typeof dc !== 'undefined' && dc.readyState == "open") {
-        dc.send(JSON.stringify({
-          "info": remoteInfo.innerHTML
-        }));
+      map1.setCenter([json.lon, json.lat]);
+      if (json.mobile) {
+        remoteInfo.innerHTML = "<b>Страна: </b>" + json.country + " [" + json.countryCode + "] </br></br>" +
+          "<b>TZ: </b><sup id='remoteTZ'>" + json.timezone + "</sup> (<sup id = 'remoteTime'>" + new Date().toLocaleTimeString("ru", { timeZone: json.timezone }).slice(0, -3) + "</sup>)"
+
+        marker1 = new mapgl.Marker(map1, {
+          coordinates: [json.lon, json.lat],
+          icon: "https://svgur.com/i/WGw.svg"
+        });
+      } else {
+        remoteInfo.innerHTML = "<b>Страна: </b>" + json.country + " [" + json.countryCode + "] </br>" +
+          "</br>" +
+          "<b>Город: </b>" + json.city + " (" + json.region + ") </br>" +
+          "<b>Регион: </b>" + json.regionName + "</br>" +
+          "<b>TZ: </b><sup id='remoteTZ'>" + json.timezone + "</sup> (<sup id = 'remoteTime'>" + new Date().toLocaleTimeString("ru", { timeZone: json.timezone }).slice(0, -3) + "</sup>)</br>"
+        //"</br>" +
+        //"<b>IP: </b>" + json.query + "</br>" +
+        // "</br>" +
+        //"<b>Mobile web: </b>" + json.mobile + "</br>" +
+        // "<b>Провайдер: </b>" + json.isp + " </br>" +
+        //"</br>" +
+        // "<b>VPN: </b>" + json.proxy + " || <b>VPS: </b>" + json.hosting
+
+        marker1 = new mapgl.Marker(map1, {
+          coordinates: [json.lon, json.lat],
+        });
       }
+
+      bridgeSend(JSON.stringify({
+        "info": remoteInfo.innerHTML,
+        "json": JSON.stringify(json)
+      }));
     })
     .fail(function (jqxhr, textStatus, error) {
       var err = textStatus + ", " + error;
