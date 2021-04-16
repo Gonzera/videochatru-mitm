@@ -72,7 +72,7 @@ async function initialize() {
     ses.loadExtension(join(app.getAppPath(), '..', 'ext/pcbjiidheaempljdefbdplebgdgpjcbe'))
 
     ses.on('will-download', function (e, item, webContents) {
-      item.setSavePath(join(app.getPath("downloads"), item.getFilename()))
+      item.setSavePath(join(app.getPath("downloads"), "videochatru", item.getFilename()))
     })
 
     createWindow()
