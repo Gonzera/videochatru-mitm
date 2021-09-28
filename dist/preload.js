@@ -1747,3 +1747,30 @@ window.RTCPeerConnection.prototype = origPeerConnection.prototype;
     };
   }
 });
+
+document.onreadystatechange = function () {
+  if (document.readyState == "complete") {
+    require('arrive')
+    const $ = require('jquery')
+
+    document.arrive(".ban-popup__unban_msg.tr", function (el) {
+      document.unbindArrive(".ban-popup__unban_msg.tr");
+      console.dir(el)
+      let new_el = $(el).clone()
+      new_el.css('height', '30px')
+      new_el.css('line-height', '26px')
+      new_el[0].innerHTML = "<b>videochatru-mitm:</b> your ip address might be temporary banned, use a vpn"
+      new_el.insertAfter(el)
+      $(createElement('button', {
+        onclick: () => {
+          ipcRenderer.send('clear' + pId, "nope");
+          location.reload()
+        },
+      }, [
+        createElement('b', {
+          innerText: "сбросить данные сессии"
+        })
+      ])).insertAfter(new_el)
+    });
+  }
+}
