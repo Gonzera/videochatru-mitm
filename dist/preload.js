@@ -65,7 +65,8 @@ let stage = 0,
   found = 0,
   play = 0,
   dc,
-  sc
+  sc,
+  autoSettings = {}
 
 let state = []
 let func = () => { }
@@ -233,31 +234,40 @@ async function runDevices(/** @type {HTMLDivElement} */ frame) {
     if (!videoContainer)
       return null
 
-    if (mirrorCheck) {
-      if (!mirrorCheck.checked) {
-        if (!($(".media-select__label-text")[0].innerText === "Logitech CAM" + opId)) {
-          if ($(".media-select__list-item:contains('Logitech CAM" + opId + "')")) {
-            $(".media-select__list-item:contains('Logitech CAM" + opId + "')").click()
+    if (stopAutoSettings && !stopAutoSettings.checked) {
+      if (mirrorCheck && typeof (autoSettings.cam) != "undefined" && autoSettings.cam != "") {
+        if (!mirrorCheck.checked) {
+          if (!($(".media-select__label-text")[0].innerText === autoSettings.cam)) {
+            if ($(".media-select__list-item:contains('" + autoSettings.cam + "')")) {
+              $(".media-select__list-item:contains('" + autoSettings.cam + "')").click()
+            }
           }
-        }
-      } else {
-        if (!($(".media-select__label-text")[0].innerText === "Logitech CAM" + pId)) {
-          if ($(".media-select__list-item:contains('Logitech CAM" + pId + "')")) {
-            $(".media-select__list-item:contains('Logitech CAM" + pId + "')").click()
+        } else {
+          if (typeof (autoSettings.mirror) != "undefined" && autoSettings.mirror != "") {
+            if (!($(".media-select__label-text")[0].innerText === autoSettings.mirror)) {
+              if ($(".media-select__list-item:contains('" + autoSettings.mirror + "')")) {
+                $(".media-select__list-item:contains('" + autoSettings.mirror + "')").click()
+              }
+            }
           }
         }
       }
-    }
 
-    if (!($(".media-select__label-text")[1].innerText === "Line " + opId + " (Virtual Audio Cable)")) {
-      if ($(".media-select__list-item:contains('Line " + pId + " (Virtual Audio Cable)')")[0]) {
-        $(".media-select__list-item:contains('Line " + opId + " (Virtual Audio Cable)')")[0].click()
+      if (typeof (autoSettings.mic) != "undefined" && autoSettings.mic != "") {
+        if (!($(".media-select__label-text")[1].innerText === autoSettings.mic)) {
+          if ($(".media-select__list-item:contains('" + autoSettings.mic + "')")[0]) {
+            $(".media-select__list-item:contains('" + autoSettings.mic + "')")[0].click()
+          }
+        }
       }
-    }
 
-    if (!($(".media-select__label-text")[2].innerText === "Line " + pId + " (Virtual Audio Cable)")) {
-      if ($(".media-select__list-item:contains('Line " + pId + " (Virtual Audio Cable)')")[1])
-        $(".media-select__list-item:contains('Line " + pId + " (Virtual Audio Cable)')")[1].click()
+      if (typeof (autoSettings.speaker) != "undefined" && autoSettings.speaker != "") {
+        if (!($(".media-select__label-text")[2].innerText === autoSettings.speaker)) {
+          if ($(".media-select__list-item:contains('" + autoSettings.speaker + "')")[0]) {
+            $(".media-select__list-item:contains('" + autoSettings.speaker + "')")[0].click()
+          }
+        }
+      }
     }
 
     try {
@@ -907,6 +917,15 @@ function injectControls() {
           })
         ]),
         createElement('br'),
+        createElement('span', {
+          innerText: "disable autosettings: ",
+        }, [
+          createElement('input', {
+            type: "checkbox",
+            id: "stopAutoSettings",
+          })
+        ]),
+        createElement('br'),
         createElement('br'),
         createElement('button', {
           onclick: () => {
@@ -1095,8 +1114,38 @@ function injectControls() {
   pId = parseInt(document.URL.replace(/^\D+/g, ''))
   opId = 1 + 2 - pId
 
+  if (pId == 1)
+    ipcRenderer.send('getSettings1')
+  else
+    ipcRenderer.send('getSettings2')
+
+  ipcRenderer.on('setSettings', (event, arg) => {
+    autoSettings = arg
+    if (arg.checkIp)
+      updateRemoteAddress("")
+
+    if (arg.ws != "") {
+      // Connect to Web Socket
+      ws = new WebSocket(arg.ws);
+
+      // Set event handlers.
+      ws.onopen = function () {
+        ws.send(JSON.stringify({ "host": pId }));
+      };
+
+      ws.onmessage = function (e) {
+        let mes = JSON.parse(e.data)
+        if (mes["sync"])
+          return
+        triggerMouseEvent(document.getElementById(mes.id), mes.event);
+      };
+    }
+  });
 
   function sync() {
+    if (typeof ws == 'undefined')
+      return
+
     let payload = {
       "sync": pId,
       "innerText": {
@@ -1133,21 +1182,6 @@ function injectControls() {
 
     ws.send(JSON.stringify(payload))
   }
-
-  // Connect to Web Socket
-  ws = new WebSocket("ws://qrlk.me:5555/");
-
-  // Set event handlers.
-  ws.onopen = function () {
-    ws.send(JSON.stringify({ "host": pId }));
-  };
-
-  ws.onmessage = function (e) {
-    let mes = JSON.parse(e.data)
-    if (mes["sync"])
-      return
-    triggerMouseEvent(document.getElementById(mes.id), mes.event);
-  };
 
   setupRTC.innerHTML = `
   <video id="leftVideo" playsinline autoplay controls style="display:none"></video>
@@ -1421,6 +1455,11 @@ let interval = setInterval(() => {
     }
   }
 
+  ipcRenderer.on('autoset', (event, arg) => {
+    console.dir(arg)
+    dirrr = arg
+  });
+
 
   if (pId == 1) {
     createOffer()
@@ -1535,8 +1574,8 @@ let interval = setInterval(() => {
             "stage": 4
           }));
 
-          remoteInfo.innerHTML = ""
-
+          if (remoteInfo.innerHTML.search("IP: ") == -1)
+            remoteInfo.innerHTML = ""
 
           bridgeSend(JSON.stringify({
             "info": remoteInfo.innerHTML
@@ -1688,6 +1727,11 @@ function updateRemoteAddress(remoteAddress) {
         // "<b>Провайдер: </b>" + json.isp + " </br>" +
         //"</br>" +
         // "<b>VPN: </b>" + json.proxy + " || <b>VPS: </b>" + json.hosting
+
+        if (remoteAddress == "") {
+          remoteInfo.innerHTML += "</br>" +
+            "<b>IP: </b>" + json.query + "</br>"
+        }
 
         marker1 = new mapgl.Marker(map1, {
           coordinates: [json.lon, json.lat],

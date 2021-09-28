@@ -326,6 +326,28 @@ async function initialize() {
       session.fromPartition("persist:" + id2).clearStorageData().then(() => { location.reload() })
     });
 
+    ipcMain.on('getSettings1', (event, arg) => {
+      event.sender.send('setSettings', {
+        "cam": app.commandLine.getSwitchValue("cam1"),
+        "mic": app.commandLine.getSwitchValue("mic1"),
+        "speaker": app.commandLine.getSwitchValue("spk1"),
+        "mirror": app.commandLine.getSwitchValue("cam2"),
+        "ws": app.commandLine.getSwitchValue("ws"),
+        "checkIp": app.commandLine.getSwitchValue("checkip")
+      });
+    });
+
+    ipcMain.on('getSettings2', (event, arg) => {
+      event.sender.send('setSettings', {
+        "cam": app.commandLine.getSwitchValue("cam2"),
+        "mic": app.commandLine.getSwitchValue("mic2"),
+        "speaker": app.commandLine.getSwitchValue("spk2"),
+        "mirror": app.commandLine.getSwitchValue("cam1"),
+        "ws": app.commandLine.getSwitchValue("ws"),
+        "checkIp": app.commandLine.hasSwitch("checkip")
+      });
+    });
+    
     start()
   })
 
