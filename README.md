@@ -7,7 +7,7 @@
 <img src="https://img.shields.io/github/contributors/qrlk/videochatru-mitm" >
 <img src="https://img.shields.io/github/last-commit/qrlk/videochatru-mitm" >
 <img src="https://img.shields.io/github/license/qrlk/videochatru-mitm" >
-<img src="https://img.shields.io/date/1632816617?label=released" >
+<img src="https://img.shields.io/date/1632942410?label=released" >
 </p>
 
 **This is an advanced desktop [Chatruletka (ome.tv)](https://github.com/qrlk/videochatru-extension#what-is-chat-roulette) client which is focused on the needs of YouTubers.**  
