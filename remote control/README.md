@@ -17,7 +17,7 @@ It is assumed that one will have input from discord, and the other will have inp
 ## remote setup
 - Communication between `remote.html` and the [control panel](https://github.com/qrlk/videochatru-mitm#control-panel) works through the websocket server `remote.py`.
 - You must run `remote.py` on a server in order to use remote control functionality.
-  - You should rent a VPS or use somewhere like PythonAnywhere or heroku.
+  - You should rent a VPS or use something like PythonAnywhere or heroku (this script consumes minimum resources).
   - Your server must have python3 and python3-pip installed.
   - Once you have it installed, just type 'pip install websocket_server' and 'python 3 remote.py` to run the server.
 - Change ip/port in the beginning of remote.html to the one where the server is running.
