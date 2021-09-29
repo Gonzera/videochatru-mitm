@@ -129,7 +129,7 @@ async function initialize() {
     const windowOptions1 = {
       width: 1080,
       minWidth: 680,
-      title: 'ChatRoulette - 1',
+      title: 'videochat-mitm: 1',
       height: 840,
       icon: join(__dirname, '/icon.png'),
       webPreferences: {
@@ -143,7 +143,7 @@ async function initialize() {
     const windowOptions2 = {
       width: 1080,
       minWidth: 680,
-      title: 'ChatRoulette - 2',
+      title: 'videochat-mitm: 2',
       height: 840,
       icon: join(__dirname, '/icon.png'),
       webPreferences: {
