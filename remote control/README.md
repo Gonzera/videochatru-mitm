@@ -25,4 +25,7 @@ It is assumed that one will have input from discord, and the other will have inp
 - Host remote.html somewhere or just give it to a friend to run it in the browser.
 
 ## screenshot
+<details>
+  
 ![](screens/Screenshot_3.png)
+</details>
