@@ -389,7 +389,7 @@ async function initialize() {
         "speaker": app.commandLine.getSwitchValue("spk1"),
         "mirror": app.commandLine.getSwitchValue("cam2"),
         "ws": app.commandLine.getSwitchValue("ws"),
-        "checkIp": app.commandLine.getSwitchValue("checkip")
+        "checkIp": app.commandLine.hasSwitch("checkip")
       });
     });
 
