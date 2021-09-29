@@ -20,18 +20,6 @@ function triggerMouseEvent(node, eventType) {
   node.dispatchEvent(clickEvent);
 }
 
-
-// faceapi = require(join(__dirname, 'face-api.min.js'))
-
-// faceapi.env.monkeyPatch({
-//   Canvas: HTMLCanvasElement,
-//   Image: HTMLImageElement,
-//   ImageData: ImageData,
-//   Video: HTMLVideoElement,
-//   createCanvasElement: () => document.createElement('canvas'),
-//   createImageElement: () => document.createElement('img')
-// });
-
 function bridgeSend(message) {
   if (pId == 1) {
     ipcRenderer.send('dc2', message);
@@ -1227,49 +1215,6 @@ let interval = setInterval(() => {
   $(".gender-selector")[0].parentElement.remove()
 
   injectControls()
-
-  // video = document.getElementById('remote-video');
-
-  // Promise.all([
-  //   faceapi.nets.tinyFaceDetector.loadFromDisk(join(__dirname, 'models')),
-  //   faceapi.nets.faceLandmark68Net.loadFromDisk(join(__dirname, 'models')),
-  //   faceapi.nets.faceRecognitionNet.loadFromDisk(join(__dirname, 'models')),
-  //   faceapi.nets.faceExpressionNet.loadFromDisk(join(__dirname, 'models')),
-  //   faceapi.nets.ageGenderNet.loadFromDisk(join(__dirname, 'models'))
-  // ])
-
-
-  // function face() {
-  //   const canvas = faceapi.createCanvasFromMedia(video);
-  //   faceapiContent.append(canvas);
-  //   const displaySize = { width: video.width, height: video.height };
-  //   faceapi.matchDimensions(canvas, displaySize);
-  //   setInterval(async () => {
-  //     const predictions = await faceapi
-  //       .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-  //       .withFaceLandmarks()
-  //       .withFaceExpressions()
-  //       .withAgeAndGender();
-
-  //     const resizedDetections = faceapi.resizeResults(predictions, displaySize);
-  //     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  //     faceapi.draw.drawDetections(canvas, resizedDetections);
-  //     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-  //     faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
-  //     resizedDetections.forEach(result => {
-  //       const { age, gender, genderProbability } = result;
-  //       new faceapi.draw.DrawTextField(
-  //         [
-  //           `${faceapi.round(age, 0)} years`,
-  //           `${gender} (${faceapi.round(genderProbability)})`
-  //         ],
-  //         result.detection.box.bottomRight
-  //       ).draw(canvas);
-  //     });
-  //   }, 1000);
-  // }
-
-  // video.onplay = face
 
   var signalingDelayMs = 0;
 
