@@ -28,7 +28,7 @@
     "files": [
       "dist/preload.js",
       "dist/2gis.js",
-      "dist/osk.js",
+      "dist/bad_words.js",
       "main.js",
       "icon.png"
     ],
