@@ -128,7 +128,7 @@ P.S. You should run VoiceMeeter on every startup (there is also a such option), 
 * **Videochatru-mitm** creates two [BrowserWindow](https://www.electronjs.org/docs/api/browser-window)'s instances with https://videochatru.com/embed in each one.
 * **Videochatru-mitm** injects a control panel into [videochatru](https://videochatru.com)'m DOM.
   * There is also a [remote control](remote%20control).
-* [Integrated extensions]() bypass fingerprinting so both istances can work together.
+* [Integrated extensions](https://github.com/qrlk/videochatru-mitm#anti-fingerprint-extensions) bypass fingerprinting so both istances can work together.
 * [Obs-studio](https://obsproject.com/) captures each instance's interlocutor's cam and outputs it through [obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
   * **Videochatru-mitm** selects the other interlocutor's camera input based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
 * [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm) handles audio mixering, receiving commands from users via [voicemeeter-connector](https://github.com/ChewbaccaCookie/voicemeeter-connector).
