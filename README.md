@@ -63,7 +63,7 @@ It is heavily dependant on **[OBS](https://github.com/qrlk/videochatru-mitm#setu
  9. Mute the first or second interlocutor.
  10. Skip the 1st / 2nd interlocutor. 
  11. Push-To-Talk for discord (right click to switch).
- 12. Push-To-Talk for music (right click to switch).
+ 12. Switch input from a music player.
  13. Push-to-talk for your mic (right click to switch).
 </details>
 
