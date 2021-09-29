@@ -10,7 +10,7 @@
 <img src="https://img.shields.io/date/1632816617?label=released" >
 </p>
 
-**This is an advanced desktop [Chatruletka (ome.tv)](https://videochatru.com/) client which is focused on the needs of YouTubers.**  
+**This is an advanced desktop [Chatruletka (ome.tv)](https://github.com/qrlk/videochatru-extension#what-is-chat-roulette) client which is focused on the needs of YouTubers.**  
 
 **It has the ability to connect interlocutors with each other and interfere in their conversations.**
 
@@ -43,8 +43,8 @@ It is heavily dependant on **[OBS](https://github.com/qrlk/videochatru-mitm#setu
 * Determine the current time in the location of the interlocutors.
 * Enable mirror mode.
 * Show a map of the interlocutors's cities.
-* Take a full screenshot of the interlocutor's camera or your own.
-* Hide the video chat watermark / banner
+* Take a full screenshot of the interlocutor's cameras.
+* Hide the video chat watermark / banner.
 * Clear session if you're banned.
 * Convenient keyboard shortcuts for the most popular buttons.
 * Control panel with an **[optional remote control](remote%20control)**.
@@ -52,7 +52,7 @@ It is heavily dependant on **[OBS](https://github.com/qrlk/videochatru-mitm#setu
 ![controls](screens/control.png)<details>
  <summary>Controls</summary>  
  
- 1. Remote IP address page.
+ 1. Remote IP addresses page.
  2. The first interlocutor's location.
  3. The second interlocutor's location.
  4. Nickname generator (Russian).
@@ -82,7 +82,7 @@ Follow the instructions:
 P.S. You will need several social media accounts if strange activity has been recorded from your IP.
 
 ## Setup OBS
-**videochatru-mitm** depends on OBS-Studio to capture each interlocutor's camera and stream it to the directshow virtual webcamera (obs-virtual-cam).
+**videochatru-mitm** depends on [OBS-Studio](https://obsproject.com) to capture each interlocutor's camera and stream it to the directshow virtual webcamera ([obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam)).
 <details>
  <summary>Setup OBS</summary>  
   
@@ -127,14 +127,13 @@ P.S. You should run VoiceMeeter on every startup (there is also a such option), 
   
 * **Videochatru-mitm** creates two [BrowserWindow](https://www.electronjs.org/docs/api/browser-window)'s instances with https://videochatru.com/embed in each one.
 * **Videochatru-mitm** injects a control panel into [videochatru](https://videochatru.com)'m DOM.
-  * There is also a [remote control]().
+  * There is also a [remote control](remote%20control).
 * [Integrated extensions]() bypass fingerprinting so both istances can work together.
 * [Obs-studio](https://obsproject.com/) captures each instance's interlocutor's cam and outputs it through [obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
   * **Videochatru-mitm** selects the other interlocutor's camera input based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
 * [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm) handles audio mixering, receiving commands from users via [voicemeeter-connector](https://github.com/ChewbaccaCookie/voicemeeter-connector).
   * **Videochatru-mitm** selects speaker output based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
-  * VoiceMeeter Potato 
-  * **Videochatru-mitm** selects camera input based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
+  * **Videochatru-mitm** selects fake mic based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
 
 
 I experimented with webrtc to implement [mitm](https://en.wikipedia.org/wiki/Man-in-the-middle_attack), but due to some chrome bugs and unpleasant delays, it was easier to stay dependent on [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm)/[obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
@@ -142,7 +141,7 @@ I experimented with webrtc to implement [mitm](https://en.wikipedia.org/wiki/Man
 
 ## Build for Windows
 
-```bash
+```cmd
 > cd src
 > npm install
 > npm run build
@@ -152,7 +151,7 @@ The portable exe file will appear in the build folder as well as the unpacked fo
 Run the executable file. You should use [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) to configure it.
 ## Run in debug mode
 
-```bash
+```cmd
 > cd src
 > npm install
 > npm start -- --dev --id1=1 --id2=2
