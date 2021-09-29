@@ -1,26 +1,12 @@
 {
-  "name": "chatroulette",
-  "version": "0.0.2-3",
-  "description": "",
+  "name": "videochatru-mitm",
+  "version": "0.0.1",
+  "description": "A tool for content creators/streamers to automate mitm attacks for pranks in chat roulette. Based on https://github.com/vicimpa/chatroulette",
   "main": "main.js",
   "repository": {
     "type": "github.com",
     "url": "https://github.com/qrlk/videochatru-mitm"
   },
-  "keywords": [
-    "desktop",
-    "client",
-    "chatroulette",
-    "chat",
-    "roulette",
-    "droidcam",
-    "snap",
-    "camera",
-    "fake",
-    "camera",
-    "cam"
-  ],
-  "author": "qrlk",
   "scripts": {
     "start": "electron .",
     "start-dev": "electron . --dev",
@@ -29,19 +15,16 @@
     "build-linux": "electron-builder install-app-deps & electron-builder -l",
     "build-mac": "electron-builder install-app-deps & electron-builder -m"
   },
-  "readme": "./README_NPM.md",
   "bin": {
     "chatroulette": "bin/chatroulette.js"
   },
-  "license": "ISC",
   "devDependencies": {
     "electron": "~10.1.4",
     "electron-builder": "~22.9.1"
   },
   "build": {
-    "appId": "com.wsv.chatroulette",
-    "productName": "ChatRoulette",
-    "copyright": "WSV",
+    "appId": "com.qrlk.videochatru-mitm",
+    "productName": "videochatru-mitm",
     "files": [
       "dist/preload.js",
       "dist/2gis.js",
@@ -58,16 +41,14 @@
     "win": {
       "target": "portable",
       "icon": "./icon.png",
-      "legalTrademarks": "WSV",
-      "publisherName": "ChatRoulette"
+      "publisherName": "videochatru-mitm"
     },
     "linux": {
       "target": "appimage",
-      "maintainer": "WSV",
       "icon": "./icon.png",
       "category": "Network",
-      "description": "ChatRoulette for Linux",
-      "executableName": "ChatRoulette"
+      "description": "videochatru-mitm for Linux",
+      "executableName": "videochatru-mitm"
     }
   },
   "dependencies": {
