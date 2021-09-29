@@ -1,6 +1,5 @@
 const { app, BrowserWindow, systemPreferences, Menu, session, ipcMain } = require('electron')
 const { join } = require('path')
-const prompt = require('electron-prompt');
 
 let mainWindow = null
 

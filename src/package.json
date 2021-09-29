@@ -43,9 +43,6 @@
   },
   "dependencies": {
     "arrive": "^2.4.1",
-    "electron-peer-connection": "^1.0.6",
-    "electron-prompt": "^1.6.2",
-    "electron-shortcuts": "^0.4.0",
     "jquery": "^3.6.0",
     "voicemeeter-connector": "^1.0.2"
   }
