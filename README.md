@@ -30,7 +30,7 @@ BIG_BOGA_SCREEN
 * Clear session if you're banned.
 * Convenient keyboard shortcuts for the most popular buttons.
 
-## Installing
+## Installation
 **Videochatru-mitm** is provided for educational purposes only.  
 
 **If you want to learn how videochatru-mitm works, then you will have to build it yourself.**
