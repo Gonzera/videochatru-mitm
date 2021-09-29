@@ -5,6 +5,12 @@ It is useful because your friends in Discord can also talk to the interlocutors.
 In addition to your microphone, videochatru-mitm supports hardcoded input from two more audio sources.  
 It is assumed that one will have input from discord, and the other will have input from a music player.  
 
+## screenshot
+<details>
+  
+![](screens/Screenshot_3.png)
+</details>
+
 ## voicemeeter setup (discord)
 - You need to install a [virtual cable](https://vac.muzychenko.net/en/index.htm).
   - VAC is an audio bridge, it transmits sound from virtual output to virtual input.
@@ -23,9 +29,3 @@ It is assumed that one will have input from discord, and the other will have inp
 - Change ip/port in the beginning of remote.html to the one where the server is running.
 - Pass your websocket url and port to videochatru-mitm as a [command line parameter](https://github.com/qrlk/videochatru-mitm#command-line-arguments): `--ws=ws://ip:port`.
 - Host remote.html somewhere or just give it to a friend to run it in the browser.
-
-## screenshot
-<details>
-  
-![](screens/Screenshot_3.png)
-</details>
