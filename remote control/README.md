@@ -10,16 +10,16 @@ It is assumed that one will have input from discord, and the other will have inp
   - VAC is an audio bridge, it transmits sound from virtual output to virtual input.
   - Lite VAC version has a limit of 1 cable.
   - If you want more you should also [install this](https://vb-audio.com/Cable/).
-- Configure the discord output to a virtual cable ([screen](http)). 
-- Add this virtual cable as a `HARDWARE INPUT 4`.
-  - If you want to use a different input number, then you must pass its number as a [command line argument](http). 
+- Configure the discord output to a virtual cable ([screen](screens/Screenshot_1.png)). 
+- Add this virtual cable as a `HARDWARE INPUT 4` ([screen](screens/Screenshot_2.png)).
+  - If you want to use a different input number, then you must pass its number as a [command line argument](https://github.com/qrlk/videochatru-mitm#command-line-arguments). 
 
 ## remote setup
-- Communication between `remote.html` and the control panel works through the websocket server `remote.py`.
+- Communication between `remote.html` and the [control panel](https://github.com/qrlk/videochatru-mitm#control-panel) works through the websocket server `remote.py`.
 - You must run `remote.py` on a server in order to use remote control functionality.
   - You should rent a VPS or use somewhere like PythonAnywhere or heroku.
   - Your server must have python3 and python3-pip installed.
   - Once you have it installed, just type 'pip install websocket_server' and 'python 3 remote.py` to run the server.
 - Change ip/port in the beginning of remote.html to the one where the server is running.
-- Pass your websocket url and port to videochatru-mitm as a command line parameter: `--ws=ws://ip:port`.
+- Pass your websocket url and port to videochatru-mitm as a [command line parameter](https://github.com/qrlk/videochatru-mitm#command-line-arguments): `--ws=ws://ip:port`.
 - Host remote.html somewhere or just give it to a friend to run it in the browser.
