@@ -66,6 +66,8 @@ let stage = 0,
   play = 0,
   dc,
   sc,
+  unmute_down = false,
+  unmute_up = false,
   autoSettings = {}
 
 let state = []
@@ -1142,53 +1144,51 @@ function injectControls() {
     }
   });
 
-  function sync() {
-    if (typeof ws == 'undefined')
-      return
-
-    let payload = {
-      "sync": pId,
-      "innerText": {
-        "localMuted": localMuted.innerText,
-        "remoteMuted": remoteMuted.innerText
-      },
-      "backgroundColor": {
-        "leftScreen": leftScreen.style.backgroundColor,
-        "leftMute": leftMute.style.backgroundColor,
-        "leftSkip": leftSkip.style.backgroundColor,
-        "leftDiscord": leftDiscord.style.backgroundColor,
-        "leftMusic": leftMusic.style.backgroundColor,
-        "leftMic": leftMic.style.backgroundColor,
-        "rightMic": rightMic.style.backgroundColor,
-        "rightMusic": rightMusic.style.backgroundColor,
-        "rightDiscord": rightDiscord.style.backgroundColor,
-        "rightSkip": rightSkip.style.backgroundColor,
-        "rightMute": rightMute.style.backgroundColor,
-        "rightScreen": rightScreen.style.backgroundColor,
-      }
-    }
-
-    if (payload.innerText.localMuted == "🔊") {
-      payload.innerText.localMuted = "no"
-    } else {
-      payload.innerText.localMuted = "yes"
-    }
-
-    if (payload.innerText.remoteMuted == "🔊") {
-      payload.innerText.remoteMuted = "no"
-    } else {
-      payload.innerText.remoteMuted = "yes"
-    }
-
-    ws.send(JSON.stringify(payload))
-  }
-
   setupRTC.innerHTML = `
   <video id="leftVideo" playsinline autoplay controls style="display:none"></video>
   <b>WebRTC 1-2 status: </b><div id="div2">Not connected</div>
 `
 }
+function sync() {
+  if (typeof ws == 'undefined')
+    return
 
+  let payload = {
+    "sync": pId,
+    "innerText": {
+      "localMuted": localMuted.innerText,
+      "remoteMuted": remoteMuted.innerText
+    },
+    "backgroundColor": {
+      "leftScreen": leftScreen.style.backgroundColor,
+      "leftMute": leftMute.style.backgroundColor,
+      "leftSkip": leftSkip.style.backgroundColor,
+      "leftDiscord": leftDiscord.style.backgroundColor,
+      "leftMusic": leftMusic.style.backgroundColor,
+      "leftMic": leftMic.style.backgroundColor,
+      "rightMic": rightMic.style.backgroundColor,
+      "rightMusic": rightMusic.style.backgroundColor,
+      "rightDiscord": rightDiscord.style.backgroundColor,
+      "rightSkip": rightSkip.style.backgroundColor,
+      "rightMute": rightMute.style.backgroundColor,
+      "rightScreen": rightScreen.style.backgroundColor,
+    }
+  }
+
+  if (payload.innerText.localMuted == "🔊") {
+    payload.innerText.localMuted = "no"
+  } else {
+    payload.innerText.localMuted = "yes"
+  }
+
+  if (payload.innerText.remoteMuted == "🔊") {
+    payload.innerText.remoteMuted = "no"
+  } else {
+    payload.innerText.remoteMuted = "yes"
+  }
+
+  ws.send(JSON.stringify(payload))
+}
 
 let interval = setInterval(() => {
   /** @type {HTMLDivElement} */
