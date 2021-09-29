@@ -23,3 +23,6 @@ It is assumed that one will have input from discord, and the other will have inp
 - Change ip/port in the beginning of remote.html to the one where the server is running.
 - Pass your websocket url and port to videochatru-mitm as a [command line parameter](https://github.com/qrlk/videochatru-mitm#command-line-arguments): `--ws=ws://ip:port`.
 - Host remote.html somewhere or just give it to a friend to run it in the browser.
+
+## screenshot
+![](screens/Screenshot_3.png)
