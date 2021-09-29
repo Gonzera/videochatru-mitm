@@ -16,27 +16,73 @@ let id2 = app.commandLine.getSwitchValue("id2")
 
 const { Voicemeeter, StripProperties } = require("voicemeeter-connector");
 
+let strips = {
+  "0": StripProperties.A1,
+  "1": StripProperties.A2,
+  "2": StripProperties.A3,
+  "3": StripProperties.A4,
+  "4": StripProperties.A5,
+  "5": StripProperties.B1,
+  "6": StripProperties.B2,
+  "7": StripProperties.B3,
+}
+
+let outputspeaker = 0
+let outputmicmusictodiscord = 1
+
+let inputmusic = 2
+let inputdiscord = 3
+
+let inputmic = 4
+
+let input1 = 5
+let input2 = 6
+
+let vmArgs = ["outputspeaker", "outputmicmusictodiscord", "inputmusic", "inputdiscord", "inputmic", "input1", "input2"]
+vmArgs.forEach(
+  (e) => {
+    if (app.commandLine.getSwitchValue(e)!="") {
+      eval(`${e} = ${parseInt(app.commandLine.getSwitchValue(e))}`)
+    }
+  }
+)
+
+let vmSpeakerOut = strips[outputspeaker.toString()]
+let vmOuputOne = strips[input1.toString()]
+let vmOutputOneMute = true
+let vmOuputTwo = strips[input2.toString()]
+let vmOutputTwoMute = true
+let vmWeirdOutputToDiscord = strips[outputmicmusictodiscord.toString()]
+
+if (vmOuputOne == StripProperties.B1 || vmOuputOne == StripProperties.B2 || vmOuputOne == StripProperties.B3) {
+  vmOutputOneMute = false
+}
+
+if (vmOuputTwo == StripProperties.B1 || vmOuputTwo == StripProperties.B2 || vmOuputTwo == StripProperties.B3) {
+  vmOutputTwoMute = false
+}
+
 Voicemeeter.init().then(async (vm_cl) => {
   // Connect to your voicemeeter client
   vm_cl.connect();
   vm = vm_cl
-  vm.setStripParameter(4, StripProperties.A4, 0)
-  vm.setStripParameter(4, StripProperties.Gain, -5.0)
-  vm.setStripParameter(0, StripProperties.A1, 1)
-  vm.setStripParameter(4, StripProperties.A5, 0)
-  vm.setStripParameter(4, StripProperties.Gain, -5.0)
-  vm.setStripParameter(1, StripProperties.A1, 1)
-  vm.setStripParameter(7, StripProperties.A4, 0)
-  vm.setStripParameter(7, StripProperties.A1, 1)
-  vm.setStripParameter(7, StripProperties.A5, 0)
-  vm.setStripParameter(7, StripProperties.A1, 1)
-  vm.setStripParameter(3, StripProperties.A4, 0)
-  vm.setStripParameter(3, StripProperties.A1, 1)
-  vm.setStripParameter(3, StripProperties.A5, 0)
-  vm.setStripParameter(3, StripProperties.A1, 1)
-  vm.setStripParameter(0, StripProperties.A1, 1)
-  vm.setStripParameter(1, StripProperties.A1, 1)
-  vm.setStripParameter(3, StripProperties.A2, 0)
+  vm.setStripParameter(inputmic, vmOuputOne, 0)
+  //vm.setStripParameter(inputmic, StripProperties.Gain, -5.0)
+  vm.setStripParameter(input1, vmSpeakerOut, 1)
+  vm.setStripParameter(inputmic, vmOuputTwo, 0)
+  //vm.setStripParameter(inputmic, StripProperties.Gain, -5.0)
+  vm.setStripParameter(input2, vmSpeakerOut, 1)
+  vm.setStripParameter(inputdiscord, vmOuputOne, 0)
+  vm.setStripParameter(inputdiscord, vmSpeakerOut, 1)
+  vm.setStripParameter(inputdiscord, vmOuputTwo, 0)
+  vm.setStripParameter(inputdiscord, vmSpeakerOut, 1)
+  vm.setStripParameter(inputmusic, vmOuputOne, 0)
+  vm.setStripParameter(inputmusic, vmSpeakerOut, 1)
+  vm.setStripParameter(inputmusic, vmOuputTwo, 0)
+  vm.setStripParameter(inputmusic, vmSpeakerOut, 1)
+  vm.setStripParameter(input1, vmSpeakerOut, 1)
+  vm.setStripParameter(input2, vmSpeakerOut, 1)
+  vm.setStripParameter(inputmusic, vmWeirdOutputToDiscord, 0)
 });
 
 
@@ -159,96 +205,107 @@ async function initialize() {
 
     function PTT_A(enable) {
       if (enable) {
-        vm.setStripParameter(4, StripProperties.A4, 1)
-        vm.setStripParameter(4, StripProperties.Gain, 0)
-        vm.setStripParameter(0, StripProperties.A1, 0)
+        vm.setStripParameter(inputmic, vmOuputOne, 1)
+        //vm.setStripParameter(inputmic, StripProperties.Gain, 0)
+        if (vmOutputOneMute)
+          vm.setStripParameter(input1, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(4, StripProperties.A4, 0)
-        vm.setStripParameter(4, StripProperties.Gain, -5.0)
-        vm.setStripParameter(0, StripProperties.A1, 1)
+        vm.setStripParameter(inputmic, vmOuputOne, 0)
+        //vm.setStripParameter(inputmic, StripProperties.Gain, -5.0)
+        if (vmOutputOneMute)
+          vm.setStripParameter(input1, vmSpeakerOut, 1)
       }
     }
 
     function PTT_B(enable) {
       if (enable) {
-        vm.setStripParameter(4, StripProperties.A5, 1)
-        vm.setStripParameter(4, StripProperties.Gain, 0)
-        vm.setStripParameter(1, StripProperties.A1, 0)
+        vm.setStripParameter(inputmic, vmOuputTwo, 1)
+        //vm.setStripParameter(inputmic, StripProperties.Gain, 0)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(input2, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(4, StripProperties.A5, 0)
-        vm.setStripParameter(4, StripProperties.Gain, -5.0)
-        vm.setStripParameter(1, StripProperties.A1, 1)
+        vm.setStripParameter(inputmic, vmOuputTwo, 0)
+        //vm.setStripParameter(inputmic, StripProperties.Gain, -5.0)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(input2, vmSpeakerOut, 1)
       }
     }
 
     function DPTT_A(enable) {
       if (enable) {
-        vm.setStripParameter(7, StripProperties.A4, 1)
-        vm.setStripParameter(7, StripProperties.A1, 0)
+        vm.setStripParameter(inputdiscord, vmOuputOne, 1)
+        if (vmOutputOneMute)
+          vm.setStripParameter(inputdiscord, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(7, StripProperties.A4, 0)
-        vm.setStripParameter(7, StripProperties.A1, 1)
+        vm.setStripParameter(inputdiscord, vmOuputOne, 0)
+        if (vmOutputOneMute)
+          vm.setStripParameter(inputdiscord, vmSpeakerOut, 1)
       }
     }
 
     function DPTT_B(enable) {
       if (enable) {
-        vm.setStripParameter(7, StripProperties.A5, 1)
-        vm.setStripParameter(7, StripProperties.A1, 0)
+        vm.setStripParameter(inputdiscord, vmOuputTwo, 1)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(inputdiscord, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(7, StripProperties.A5, 0)
-        vm.setStripParameter(7, StripProperties.A1, 1)
+        vm.setStripParameter(inputdiscord, vmOuputTwo, 0)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(inputdiscord, vmSpeakerOut, 1)
       }
     }
 
     function MUSIC_A(enable) {
       if (enable) {
-        vm.setStripParameter(3, StripProperties.A4, 1)
-        vm.setStripParameter(3, StripProperties.A1, 0)
+        vm.setStripParameter(inputmusic, vmOuputOne, 1)
+        if (vmOutputOneMute)
+          vm.setStripParameter(inputmusic, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(3, StripProperties.A4, 0)
-        vm.setStripParameter(3, StripProperties.A1, 1)
+        vm.setStripParameter(inputmusic, vmOuputOne, 0)
+        if (vmOutputOneMute)
+          vm.setStripParameter(inputmusic, vmSpeakerOut, 1)
       }
     }
 
     function MUSIC_B(enable) {
       if (enable) {
-        vm.setStripParameter(3, StripProperties.A5, 1)
-        vm.setStripParameter(3, StripProperties.A1, 0)
+        vm.setStripParameter(inputmusic, vmOuputTwo, 1)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(inputmusic, vmSpeakerOut, 0)
       } else {
-        vm.setStripParameter(3, StripProperties.A5, 0)
-        vm.setStripParameter(3, StripProperties.A1, 1)
+        vm.setStripParameter(inputmusic, vmOuputTwo, 0)
+        if (vmOutputTwoMute)
+          vm.setStripParameter(inputmusic, vmSpeakerOut, 1)
       }
     }
 
     function SWITCH_A() {
-      if (vm.getStripParameter(0, StripProperties.A1) == 0) {
-        vm.setStripParameter(0, StripProperties.A1, 1)
+      if (vm.getStripParameter(input1, vmSpeakerOut) == 0) {
+        vm.setStripParameter(input1, vmSpeakerOut, 1)
       } else {
-        vm.setStripParameter(0, StripProperties.A1, 0)
+        vm.setStripParameter(input1, vmSpeakerOut, 0)
       }
     }
 
     function SWITCH_B() {
-      if (vm.getStripParameter(1, StripProperties.A1) == 0) {
-        vm.setStripParameter(1, StripProperties.A1, 1)
+      if (vm.getStripParameter(input2, vmSpeakerOut) == 0) {
+        vm.setStripParameter(input2, vmSpeakerOut, 1)
       } else {
-        vm.setStripParameter(1, StripProperties.A1, 0)
+        vm.setStripParameter(input2, vmSpeakerOut, 0)
       }
     }
 
     function SWITCH_DISCORD() {
-      if (vm.getStripParameter(3, StripProperties.A2) == 0) {
-        vm.setStripParameter(3, StripProperties.A2, 1)
+      if (vm.getStripParameter(inputmusic, vmWeirdOutputToDiscord) == 0) {
+        vm.setStripParameter(inputmusic, vmWeirdOutputToDiscord, 1)
       } else {
-        vm.setStripParameter(3, StripProperties.A2, 0)
+        vm.setStripParameter(inputmusic, vmWeirdOutputToDiscord, 0)
       }
     }
 
     ipcMain.on('SWITCH_DISCORD', (event, arg) => {
       SWITCH_DISCORD()
     });
-
 
     ipcMain.on('SWITCH_A', (event, arg) => {
       SWITCH_A()
@@ -347,7 +404,7 @@ async function initialize() {
         "checkIp": app.commandLine.hasSwitch("checkip")
       });
     });
-    
+
     start()
   })
 
