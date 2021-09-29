@@ -28,7 +28,7 @@ The program is incomplete and requires skills to set up.
 
 It is terribly coded and there was no plan to publish it at all.
 
-It is heavily dependant on [OBS](https://github.com/qrlk/videochatru-mitm#setup-obs) and [VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter).
+It is heavily dependant on **[OBS](https://github.com/qrlk/videochatru-mitm#setup-obs)** and **[VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter)**.
 
 **If you are a casual user, [go here](https://github.com/qrlk/videochatru-extension).**
 
@@ -40,7 +40,7 @@ It is heavily dependant on [OBS](https://github.com/qrlk/videochatru-mitm#setup-
   * Add music.
   * Add any voicemeeter input such as discord.
 * Determine the location of the interlocutors by their IP addresses.
-* Determine the current time of the interlocutors's locations.
+* Determine the current time in the location of the interlocutors.
 * Enable mirror mode.
 * Show a map of the interlocutors's cities.
 * Take a full screenshot of the interlocutor's camera or your own.
@@ -78,6 +78,8 @@ Follow the instructions:
 * **[Setup OBS](https://github.com/qrlk/videochatru-mitm#setup-obs)**
 * **[Setup VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter)**
 * **[Actually build videochatru-mitm](https://github.com/qrlk/videochatru-mitm#build-for-windows)**
+
+P.S. You will need several social media accounts if strange activity has been recorded from your IP.
 
 ## Setup OBS
 **videochatru-mitm** depends on OBS-Studio to capture each interlocutor's camera and stream it to the directshow virtual webcamera (obs-virtual-cam).
