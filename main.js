@@ -41,7 +41,7 @@ let input2 = 6
 let vmArgs = ["outputspeaker", "outputmicmusictodiscord", "inputmusic", "inputdiscord", "inputmic", "input1", "input2"]
 vmArgs.forEach(
   (e) => {
-    if (app.commandLine.getSwitchValue(e)!="") {
+    if (app.commandLine.getSwitchValue(e) != "") {
       eval(`${e} = ${parseInt(app.commandLine.getSwitchValue(e))}`)
     }
   }
