@@ -2,20 +2,38 @@
 <h1 align="center">videochatru-mitm</h1>
 
 <p align="center">
+<img src="https://img.shields.io/badge/Supported_OS-Windows-orange.svg" >
+<img src="https://img.shields.io/badge/contributions-not%20welcome-blue.svg?style=flat&color=red" >
 <img src="https://img.shields.io/github/contributors/qrlk/videochatru-mitm" >
 <img src="https://img.shields.io/github/last-commit/qrlk/videochatru-mitm" >
 <img src="https://img.shields.io/github/license/qrlk/videochatru-mitm" >
 <img src="https://img.shields.io/date/1632816617?label=released" >
 </p>
 
-**DESC**
+**This is an advanced desktop [Chatruletka (ome.tv)](https://videochatru.com/) client which is focused on the needs of YouTubers.**  
 
-> WARNING
+**It has the ability to connect interlocutors with each other and interfere in their conversations.**
 
-BIG_BOGA_SCREEN
+<p align="center">
+ <img src="screens/screen.gif"> 
+</p>
+
+--------------
+### **videochatru-mitm** is provided for educational purposes only.
+### Usage of it for other purposes might be illegal in your country.  
+### Developers assume no liability and are not responsible for any misuse or damage caused by this program.
+--------------
+## Information
+The program is incomplete and requires skills to set up.
+
+It is terribly coded and there was no plan to publish it at all.
+
+It is heavily dependant on [OBS](https://github.com/qrlk/videochatru-mitm#setup-obs) and [VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter).
+
+**If you are a casual user, [go here](https://github.com/qrlk/videochatru-extension).**
 
 ## Features
-* **Connect two interlocutors to each other.**
+* **Connect the two interlocutors to each other.**
 * **Manipulate their cameras using OBS.**
 * **Manipulate their audio feeds using videochatru-mitm's control panel and voicemeeter.**
   * Add your mic.
@@ -29,6 +47,25 @@ BIG_BOGA_SCREEN
 * Hide the video chat watermark / banner
 * Clear session if you're banned.
 * Convenient keyboard shortcuts for the most popular buttons.
+* Control panel with an **[optional remote control](remote%20control)**.
+## Control panel
+![controls](screens/control.png)<details>
+ <summary>Controls</summary>  
+ 
+ 1. Remote IP address page.
+ 2. The first interlocutor's location.
+ 3. The second interlocutor's location.
+ 4. Nickname generator (Russian).
+ 5. WebRTC status 1 - 2.
+ 6. Settings page.
+ 7. NSFW detector (extracted from the published version).
+ 8. Make a screenshot of the 1st / 2nd camera (create a "videochatru" folder in your Downloads).
+ 9. Mute the first or second interlocutor.
+ 10. Skip the 1st / 2nd interlocutor. 
+ 11. Push-To-Talk for discord (right click to switch).
+ 12. Push-To-Talk for music (right click to switch).
+ 13. Push-to-talk for your mic (right click to switch).
+</details>
 
 ## Installation
 **Videochatru-mitm** is provided for educational purposes only.  
@@ -37,25 +74,25 @@ BIG_BOGA_SCREEN
 
 You will have to clone/download the repository, install **[nodejs](http://nodejs.org/en/download)**, open the command line in the repository.
 
-Follow the instruction:
-* **[Setup OBS](#)**.
-* **[Setup VoiceMeeter Potato](#)**.
-* **[Actually build videochatru-mitm](#)**.
+Follow the instructions:
+* **[Setup OBS](https://github.com/qrlk/videochatru-mitm#setup-obs)**
+* **[Setup VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter)**
+* **[Actually build videochatru-mitm](https://github.com/qrlk/videochatru-mitm#build-for-windows)**
 
 ## Setup OBS
 **videochatru-mitm** depends on OBS-Studio to capture each interlocutor's camera and stream it to the directshow virtual webcamera (obs-virtual-cam).
 <details>
  <summary>Setup OBS</summary>  
   
-* Install OBS-Studio.
-* Install obs-virtual-cam.
+* Install [OBS-Studio](https://obsproject.com/).
+* Install [obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
   * Select 4 cameras.
 * (optional) change each camera's name.
-  * open regedit.exe
-  * search for "obs-camera"
-  * replace each unique camera to something unique like "CAMERA1"/"CAMERA2"/"CAMERA3"/"CAMERA4".
-* Select OBS output resolution: 640x480.
-* Select OBS bitrate output ~900 kbps (?).
+  * Open regedit.exe.
+  * Search for "obs-camera".
+  * Replace each unique camera to something unique like "CAMERA1"/"CAMERA2"/"CAMERA3"/"CAMERA4".
+* Select the OBS output resolution: 640x480.
+* Select the OBS bitrate output ~900 kbps (?).
 * Enable Studio mode.
 * Create two scenes, on each capture each videochatru-mitm's window and crop it so that the interlocutor's camera occupies the entire screen.
 * Create a scene filter Virtual Camera and select CAMERA1/CAMERA2, press 'start'.
@@ -66,14 +103,14 @@ P.S. Always start filter output before reading input from the camera, otherwise 
 </details>
 
 ## Setup VoiceMeeter
-**videochatru-mitm** depends on VoiceMeeter Potato to manipulate audio.
+**videochatru-mitm** depends on [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm) to manipulate audio.
 <details>
  <summary>Setup VoiceMeeter Potato</summary>  
   
-* Install VoiceMeeter Potato.
+* Install [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm).
 * Select your mic at `HARWARE INPUT 5`
 * Select your speaker at `HARDWARE OUTPUT A1`
-* Select `VAIO 3` as default sound output on your pc.
+* Select `VAIO 3` as the default sound output on your pc.
 * Make sure that `Virtual Input VoiceMeeter VAIO` has `A1` and `B1` enabled.
 * Make sure that `Virtual Input VoiceMeeter AUX` has `A1` and `B2` enabled.
 * `HARWARE INPUT 4` and `HARWARE INPUT 3` are used as discord/music input, use [VAC](https://vac.muzychenko.net/en/) if you want this functionality.
@@ -91,11 +128,11 @@ P.S. You should run VoiceMeeter on every startup (there is also a such option), 
   * There is also a [remote control]().
 * [Integrated extensions]() bypass fingerprinting so both istances can work together.
 * [Obs-studio](https://obsproject.com/) captures each instance's interlocutor's cam and outputs it through [obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
-  * **Videochatru-mitm** selects the other interlocutor's camera input based on the [command line arguments]() passed to it.
+  * **Videochatru-mitm** selects the other interlocutor's camera input based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
 * [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm) handles audio mixering, receiving commands from users via [voicemeeter-connector](https://github.com/ChewbaccaCookie/voicemeeter-connector).
-  * **Videochatru-mitm** selects speaker output based on the [command line arguments]() passed to it.
+  * **Videochatru-mitm** selects speaker output based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
   * VoiceMeeter Potato 
-  * **Videochatru-mitm** selects camera input based on the [command line arguments]() passed to it.
+  * **Videochatru-mitm** selects camera input based on the [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) passed to it.
 
 
 I experimented with webrtc to implement [mitm](https://en.wikipedia.org/wiki/Man-in-the-middle_attack), but due to some chrome bugs and unpleasant delays, it was easier to stay dependent on [VoiceMeeter Potato](https://vb-audio.com/Voicemeeter/potato.htm)/[obs-virtual-cam](https://github.com/Fenrirthviti/obs-virtual-cam).
@@ -110,7 +147,7 @@ I experimented with webrtc to implement [mitm](https://en.wikipedia.org/wiki/Man
 ```
 The portable exe file will appear in the build folder as well as the unpacked folder.  
 
-Run the executable file. You should use [command line arguments]() to configure it.
+Run the executable file. You should use [command line arguments](https://github.com/qrlk/videochatru-mitm#command-line-arguments) to configure it.
 ## Run in debug mode
 
 ```bash
@@ -121,7 +158,7 @@ Run the executable file. You should use [command line arguments]() to configure 
 ## Command line arguments
 To configure the program for yourself, you need to use command-line arguments. 
 
-For example, when you install and configure Voicemeeter Potato and obs-virtual-cam, something like this would be enough:
+For example, when you install and configure [Voicemeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter) and [obs-virtual-cam](https://github.com/qrlk/videochatru-mitm#setup-obs), something like this would be enough:
 
 > `videochatru-mitm.exe --id1=4 --id2=5 --cam1=OBS-Camera2 --cam2=OBS-Camera --mic2='VoiceMeeter Output (VB-Audio VoiceMeeter VAIO)' --mic1='VoiceMeeter Aux Output (VB-Audio VoiceMeeter AUX VAIO)' --spk2='VoiceMeeter Aux Input (VB-Audio VoiceMeeter AUX VAIO)' --spk1='VoiceMeeter Input (VB-Audio VoiceMeeter VAIO)' `
 <details>
