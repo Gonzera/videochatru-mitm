@@ -1,62 +1,23 @@
-# Чат рулетка
-[![Чат рулетка](logo_min.png)](https://videochatru.com/)
-
------------------
-[![Build Info](https://img.shields.io/cirrus/github/vicimpa/chatroulette)](https://github.com/vicimpa/chatroullete)
-[![Download](https://img.shields.io/github/downloads/vicimpa/chatroulette/0.0.2/total)](https://github.com/vicimpa/chatroulette/releases)
-[![Npm version](https://img.shields.io/npm/v/chatroulette)](https://www.npmjs.com/package/chatroulette)
-[![Npm License](https://img.shields.io/npm/l/chatroulette)](https://www.npmjs.com/package/chatroulette)
-[![VK Link](https://img.shields.io/badge/social-vk-blue)](https://vk.com/vicimpa)
-[![Telegram Link](https://img.shields.io/badge/social-tg-9cf)](https://telegram.im/@vic_dev)
-
-Неофициальный десктопный клиент чат рулетки, который прекрасно подойдет для тех, кому нужно намеренно направить звук с чат рулетки в программу захвата звука, для тех, кто использует обработку видео в чате, для тех, у кого стоит DroidCam, ManyCam и прочая дичь, улучшающая изображение и для тех, у кого есть микрофон, из-за которого не пускают в чат рулетку. Легко обходит запрет на использование виртуальной камеры. Позже планируется доработка в сторону расширения функциональности приложения. Я не нашел альтернатив, по этому и собрал клиент чат рулетки для компьютера. Очень прошу написать мне в [vk](https://vk.com/vicimpa) если у Вас что-то не работает, постараюсь помочь.
-
-- Нет необходимости устанавливать
-- Работает независимо от операционной системы
-- Не обращает внимание на присутствующие камеры
-- Убрана реклама и прочая лишняя информация
-- Есть возможность выбирать вывод на аудиоустройства
-
-Загрузить можно [тут](https://github.com/vicimpa/chatrulette/releases/latest)
+# Сборка
+videochatru-mitm предоставляется только в образовательных целях, поэтому я не могу распространять его в собранном виде.  
+Если вы хотите изучить работу videochatru-mitm, то вам придется собрать его самостоятельно.  
+Вам придётся склонировать/скачать репозиторий, скачать [nodejs](https://nodejs.org/en/download), открыть командную строку в репозитории и следовать инструкции.
 
 # Сборка под Windows
 
 ```bash
+> cd src
 > npm install
-> npm run build-windows
+> npm run build
 ```
 
-# Сборка под Linux
-
-```bash
-> npm install
-> npm run build-linux
-```
-
-# Сборка под MacOS
-
-```bash
-> npm install
-> npm run build-mac
-```
+# Сборка под Linux и MacOs
+Сборка под Linux и MacOs не имеет смысла, так как videochatru-mitm зависит от VoiceMeeter Potato, который доступен только на Windows.
 
 # Запуск в режиме отладки
 
 ```bash
+> cd src
 > npm install
-> npm start
+> npm start -- --dev
 ```
-
-# Установка с npm
-```bash
-> npm i -g chatroulette
-> chatroulette
-```
-
-# Скриншоты
-
->
-> ![screen](screen/img1.png)
->
-> ![screen](screen/img2.png)
-> 

@@ -10,10 +10,7 @@
   "scripts": {
     "start": "electron .",
     "start-dev": "electron . --dev",
-    "build": "electron-builder install-app-deps & electron-builder -wlm",
-    "build-windows": "electron-builder install-app-deps & electron-builder -w",
-    "build-linux": "electron-builder install-app-deps & electron-builder -l",
-    "build-mac": "electron-builder install-app-deps & electron-builder -m"
+    "build": "electron-builder install-app-deps & electron-builder -w"
   },
   "bin": {
     "chatroulette": "bin/chatroulette.js"
@@ -23,7 +20,7 @@
     "electron-builder": "~22.9.1"
   },
   "build": {
-    "appId": "com.qrlk.videochatru-mitm",
+    "appId": "videochatru-mitm",
     "productName": "videochatru-mitm",
     "files": [
       "dist/preload.js",
@@ -42,13 +39,6 @@
       "target": "portable",
       "icon": "./icon.png",
       "publisherName": "videochatru-mitm"
-    },
-    "linux": {
-      "target": "appimage",
-      "icon": "./icon.png",
-      "category": "Network",
-      "description": "videochatru-mitm for Linux",
-      "executableName": "videochatru-mitm"
     }
   },
   "dependencies": {
