@@ -1,5 +1,9 @@
 <html>
 
+<script type="text/javascript">
+  webSocketServer = "ws://YOUR_SERVER_URL_OR_SERVER_IP_GOES_HERE:YOUR_SERVER_PORT_GOES_HERE/"
+</script>
+
 <head>
   <title>videochatru-mitm remote control</title>
 
@@ -278,7 +282,7 @@
     function init() {
 
       // Connect to Web Socket
-      ws = new WebSocket("ws://qrlk.me:5555/");
+      ws = new WebSocket(webSocketServer);
 
       // Set event handlers.
       ws.onopen = function (e) {
