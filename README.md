@@ -26,7 +26,7 @@
 ## Information
 The program is incomplete and requires skills to set up.
 
-It is terribly coded and there was no plan to publish it at all.
+It is terribly coded and there were no plans to publish it at all.
 
 It is heavily dependant on **[OBS](https://github.com/qrlk/videochatru-mitm#setup-obs)** and **[VoiceMeeter Potato](https://github.com/qrlk/videochatru-mitm#setup-voicemeeter)**.
 
@@ -230,9 +230,11 @@ Building for Linux and Mac doesn't make sense, since **videochatru-mitm** depend
 ## Contribution
 I have no motivation/interest/time for further development of this project.  
 
-I am not interested in Pull Requests and cannot guarantee that they will be reviewed.
+I am not interested in pull requests and cannot guarantee that they will be reviewed.
 
 It may still be worth sending pull requests in case it will be useful to someone even without a review.
+
+A pull request with corrections of my English in the readme is welcome!
 
 ## Background
 **I was developing this project for my cancelled YouTube/TikTok project.**
