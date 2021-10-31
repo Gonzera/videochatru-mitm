@@ -2,6 +2,9 @@ const { join } = require('path')
 
 require(join(__dirname, 'bad_words.js'))
 
+require(join(__dirname, 'ws_hacks.js'))
+
+
 function random_female() {
   return osk_adj_female[Math.floor(Math.random() * osk_adj_female.length)] + ' ' + osk_female[Math.floor(Math.random() * osk_female.length)]
 }
